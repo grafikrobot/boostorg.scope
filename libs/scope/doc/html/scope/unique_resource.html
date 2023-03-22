@@ -1,0 +1,411 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Unique resource wrapper</title>
+<link rel="stylesheet" href="../../../../../doc/src/boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets Vsnapshot">
+<link rel="home" href="../index.html" title="Chapter 1. Boost.Scope">
+<link rel="up" href="../index.html" title="Chapter 1. Boost.Scope">
+<link rel="prev" href="scope_guards.html" title="Scope guards">
+<link rel="next" href="../reference.html" title="Reference">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><tr><td valign="top"><img alt="Boost C++ Libraries" width="277" height="86" src="../../../../../boost.png"></td></tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="scope_guards.html"><img src="../../../../../doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="../../../../../doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../index.html"><img src="../../../../../doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="../reference.html"><img src="../../../../../doc/src/images/next.png" alt="Next"></a>
+</div>
+<div class="section">
+<div class="titlepage"><div><div><h2 class="title" style="clear: both">
+<a name="scope.unique_resource"></a><a class="link" href="unique_resource.html" title="Unique resource wrapper">Unique resource wrapper</a>
+</h2></div></div></div>
+<div class="toc"><dl class="toc"><dt><span class="section"><a href="unique_resource.html#scope.unique_resource.resource_traits">Resource traits</a></span></dt></dl></div>
+<pre class="programlisting"><span class="preprocessor">#include</span> <span class="special">&lt;</span><code class="computeroutput"><a class="link" href="../reference.html#header.boost.scope.unique_resource_hpp" title="Header &lt;boost/scope/unique_resource.hpp&gt;">boost/scope/unique_resource.hpp</a></code><span class="special">&gt;</span>
+</pre>
+<p>
+      Boost.Scope provides a <code class="computeroutput"><a class="link" href="../boost/scope/unique_resource.html" title="Class template unique_resource">unique_resource</a></code>
+      class template. This is a wrapper for an arbitrary resource that represents
+      exclusive ownership of the resource. The wrapper offers access to the owned
+      resource and automatically calls a deleter function object to free the resource
+      upon destruction. This is a generalization of <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">unique_ptr</span></code>,
+      but while <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">unique_ptr</span></code> is only used to wrap pointers,
+      <code class="computeroutput"><a class="link" href="../boost/scope/unique_resource.html" title="Class template unique_resource">unique_resource</a></code>
+      can wrap other types of resources as well.
+    </p>
+<p>
+      A resource type must have the following properties to be compatible with <code class="computeroutput"><a class="link" href="../boost/scope/unique_resource.html" title="Class template unique_resource">unique_resource</a></code>:
+    </p>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; ">
+<li class="listitem">
+          Move-constructible, where the move constructor is marked as <code class="computeroutput"><span class="keyword">noexcept</span></code>, or
+        </li>
+<li class="listitem">
+          Copy-constructible, or
+        </li>
+<li class="listitem">
+          An lvalue reference to an object type.
+        </li>
+</ul></div>
+<p>
+      Note that if the resource type is a reference, the referenced object must be
+      stored externally to the <code class="computeroutput"><a class="link" href="../boost/scope/unique_resource.html" title="Class template unique_resource">unique_resource</a></code>
+      wrapper and must remain valid for the entire duration of ownership by the wrapper.
+      Users are not expected to access the resource object other than through the
+      <code class="computeroutput"><a class="link" href="../boost/scope/unique_resource.html" title="Class template unique_resource">unique_resource</a></code>
+      wrapper. For example, it is not allowed to modify the resource object by setting
+      it to an invalid state or explicitly freeing the resource circumventing the
+      resource wrapper, as the wrapper will still invoke the deleter on the then-invalid
+      resource.
+    </p>
+<p>
+      The deleter must be a function object type that is callable on an lvalue of
+      the resource type. The deleter must be copy-constructible. Although not strictly
+      required, it is generally highly recommended that calling a deleter on a resource
+      doesn't throw exceptions and is marked <code class="computeroutput"><span class="keyword">noexcept</span></code>,
+      as the deleter will often be called from the <code class="computeroutput"><a class="link" href="../boost/scope/unique_resource.html" title="Class template unique_resource">unique_resource</a></code>
+      destructor.
+    </p>
+<p>
+      Like <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">unique_ptr</span></code>, <code class="computeroutput"><a class="link" href="../boost/scope/unique_resource.html" title="Class template unique_resource">unique_resource</a></code>
+      is not copyable and supports a number of other operations, such as move construction
+      and assignment, <code class="computeroutput"><span class="identifier">reset</span></code>, <code class="computeroutput"><span class="identifier">release</span></code> and <code class="computeroutput"><span class="identifier">swap</span></code>
+      with the similar semantics. Some of the operations impose additional requirements
+      on the resource and deleter types; such operations will not be available if
+      those requirements aren't met. For example, <code class="computeroutput"><span class="identifier">swap</span></code>
+      is only supported if both the resource and deleter types are swappable, and
+      at least one of those types is nothrow swappable (the last part is necessary
+      to implement the <a href="https://en.cppreference.com/w/cpp/language/exceptions" target="_top">strong
+      exception guarantee</a> for the <code class="computeroutput"><span class="identifier">swap</span></code>
+      operation). The requirements are listed for each operation in the <code class="computeroutput"><a class="link" href="../boost/scope/unique_resource.html" title="Class template unique_resource">unique_resource</a></code> class reference.
+    </p>
+<div class="tip"><table border="0" summary="Tip">
+<tr>
+<td rowspan="2" align="center" valign="top" width="25"><img alt="[Tip]" src="../../../../../doc/src/images/tip.png"></td>
+<th align="left">Tip</th>
+</tr>
+<tr><td align="left" valign="top"><p>
+        If the resource type is dereferenceable (i.e. supports unary <code class="computeroutput"><span class="keyword">operator</span><span class="special">*</span></code>),
+        <code class="computeroutput"><a class="link" href="../boost/scope/unique_resource.html" title="Class template unique_resource">unique_resource</a></code>
+        also provides <code class="computeroutput"><span class="keyword">operator</span><span class="special">*</span></code>
+        and <code class="computeroutput"><span class="keyword">operator</span><span class="special">-&gt;</span></code>,
+        making it act more like a smart-pointer.
+      </p></td></tr>
+</table></div>
+<p>
+      Let's consider a usage example.
+    </p>
+<pre class="programlisting"><span class="comment">// A deleter for POSIX-like file descriptors</span>
+<span class="keyword">struct</span> <span class="identifier">fd_deleter</span>
+<span class="special">{</span>
+    <span class="keyword">void</span> <span class="keyword">operator</span><span class="special">()</span> <span class="special">(</span><span class="keyword">int</span> <span class="identifier">fd</span><span class="special">)</span> <span class="keyword">const</span> <span class="keyword">noexcept</span>
+    <span class="special">{</span>
+        <span class="keyword">if</span> <span class="special">(</span><span class="identifier">fd</span> <span class="special">&gt;=</span> <span class="number">0</span><span class="special">)</span>
+            <span class="identifier">close</span><span class="special">(</span><span class="identifier">fd</span><span class="special">);</span>
+    <span class="special">}</span>
+<span class="special">};</span>
+
+<span class="comment">// Writes a string to a file</span>
+<span class="keyword">void</span> <span class="identifier">write_string</span><span class="special">(</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">string</span> <span class="keyword">const</span><span class="special">&amp;</span> <span class="identifier">filename</span><span class="special">,</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">string</span> <span class="keyword">const</span><span class="special">&amp;</span> <span class="identifier">str</span><span class="special">)</span>
+<span class="special">{</span>
+    <span class="comment">// Create a unique resource for a file</span>
+    <span class="identifier">boost</span><span class="special">::</span><span class="identifier">scope</span><span class="special">::</span><span class="identifier">unique_resource</span><span class="special">&lt;</span> <span class="keyword">int</span><span class="special">,</span> <span class="identifier">fd_deleter</span> <span class="special">&gt;</span> <span class="identifier">file</span><span class="special">(</span><span class="identifier">open</span><span class="special">(</span><span class="identifier">filename</span><span class="special">.</span><span class="identifier">c_str</span><span class="special">(),</span> <span class="identifier">O_CREAT</span> <span class="special">|</span> <span class="identifier">O_WRONLY</span><span class="special">));</span>
+    <span class="keyword">if</span> <span class="special">(</span><span class="identifier">file</span><span class="special">.</span><span class="identifier">get</span><span class="special">()</span> <span class="special">&lt;</span> <span class="number">0</span><span class="special">)</span>
+    <span class="special">{</span>
+        <span class="keyword">int</span> <span class="identifier">err</span> <span class="special">=</span> <span class="identifier">errno</span><span class="special">;</span>
+        <span class="keyword">throw</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">system_error</span><span class="special">(</span><span class="identifier">err</span><span class="special">,</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">generic_category</span><span class="special">(),</span> <span class="string">"Failed to open file "</span> <span class="special">+</span> <span class="identifier">filename</span><span class="special">);</span>
+    <span class="special">}</span>
+
+    <span class="comment">// Use it to write data to the file</span>
+    <span class="keyword">const</span> <span class="keyword">char</span><span class="special">*</span> <span class="identifier">p</span> <span class="special">=</span> <span class="identifier">str</span><span class="special">.</span><span class="identifier">data</span><span class="special">();</span>
+    <span class="identifier">std</span><span class="special">::</span><span class="identifier">size_t</span> <span class="identifier">size_left</span> <span class="special">=</span> <span class="identifier">str</span><span class="special">.</span><span class="identifier">size</span><span class="special">();</span>
+    <span class="keyword">while</span> <span class="special">(</span><span class="identifier">size_left</span> <span class="special">&gt;</span> <span class="number">0</span><span class="special">)</span>
+    <span class="special">{</span>
+        <span class="identifier">ssize_t</span> <span class="identifier">written</span> <span class="special">=</span> <span class="identifier">write</span><span class="special">(</span><span class="identifier">file</span><span class="special">.</span><span class="identifier">get</span><span class="special">(),</span> <span class="identifier">p</span><span class="special">,</span> <span class="identifier">size_left</span><span class="special">);</span>
+        <span class="keyword">if</span> <span class="special">(</span><span class="identifier">written</span> <span class="special">&lt;</span> <span class="number">0</span><span class="special">)</span>
+        <span class="special">{</span>
+            <span class="keyword">int</span> <span class="identifier">err</span> <span class="special">=</span> <span class="identifier">errno</span><span class="special">;</span>
+            <span class="keyword">if</span> <span class="special">(</span><span class="identifier">err</span> <span class="special">==</span> <span class="identifier">EINTR</span><span class="special">)</span>
+                <span class="keyword">continue</span><span class="special">;</span>
+            <span class="keyword">throw</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">system_error</span><span class="special">(</span><span class="identifier">err</span><span class="special">,</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">generic_category</span><span class="special">(),</span> <span class="string">"Failed to write data"</span><span class="special">);</span>
+        <span class="special">}</span>
+
+        <span class="identifier">p</span> <span class="special">+=</span> <span class="identifier">written</span><span class="special">;</span>
+        <span class="identifier">size_left</span> <span class="special">-=</span> <span class="identifier">written</span><span class="special">;</span>
+    <span class="special">}</span>
+<span class="special">}</span>
+</pre>
+<div class="note"><table border="0" summary="Note">
+<tr>
+<td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="../../../../../doc/src/images/note.png"></td>
+<th align="left">Note</th>
+</tr>
+<tr><td align="left" valign="top"><p>
+        POSIX-like file descriptors are supported on Windows through non-standard
+        APIs like <a href="https://learn.microsoft.com/en-us/cpp/c-runtime-library/reference/open-wopen" target="_top"><code class="computeroutput"><span class="identifier">_open</span></code></a>, <a href="https://learn.microsoft.com/en-us/cpp/c-runtime-library/reference/close" target="_top"><code class="computeroutput"><span class="identifier">_close</span></code></a>, <a href="https://learn.microsoft.com/en-us/cpp/c-runtime-library/reference/write" target="_top"><code class="computeroutput"><span class="identifier">_write</span></code></a> and others. It is often
+        possible to port a program performing simple IO with regular files and file
+        descriptors to Windows by simple renaming. However, here and below we will
+        be using the standard POSIX nomenclature.
+      </p></td></tr>
+</table></div>
+<p>
+      In this example, there are several points to note. First, the <code class="computeroutput"><span class="identifier">fd_deleter</span></code> function object checks if the
+      file descriptor is valid before passing it to <code class="computeroutput"><span class="identifier">close</span></code>.
+      This is necessary in this piece of code because we unconditionally initialize
+      <code class="computeroutput"><a class="link" href="../boost/scope/unique_resource.html" title="Class template unique_resource">unique_resource</a></code>
+      object with the value returned by <code class="computeroutput"><span class="identifier">open</span></code>,
+      which may be -1 indicating an error. By default, <code class="computeroutput"><a class="link" href="../boost/scope/unique_resource.html" title="Class template unique_resource">unique_resource</a></code>
+      doesn't discriminate valid (i.e. allocated) resource values from invalid (i.e.
+      unallocated), which means that from its perspective the value of -1 is a file
+      descriptor that needs to be freed by calling the deleter on it. Therefore,
+      the deleter must be prepared to handle resource values that are unallocated.
+      Later on we will see how to change this.
+    </p>
+<div class="tip"><table border="0" summary="Tip">
+<tr>
+<td rowspan="2" align="center" valign="top" width="25"><img alt="[Tip]" src="../../../../../doc/src/images/tip.png"></td>
+<th align="left">Tip</th>
+</tr>
+<tr><td align="left" valign="top"><p>
+        Besides the resource value, you can specify the deleter object as the second
+        argument of the <code class="computeroutput"><a class="link" href="../boost/scope/unique_resource.html" title="Class template unique_resource">unique_resource</a></code>
+        constructor. In fact, the second argument is mandatory if the deleter is
+        not default-constructible or its default constructor may throw. This is necessary
+        to be able to call the deleter on the passed resource value, should the construction
+        of either the resource or the deleter throw. This ensures that the resource
+        doesn't leak in case if <code class="computeroutput"><a class="link" href="../boost/scope/unique_resource.html" title="Class template unique_resource">unique_resource</a></code>
+        initialization fails.
+      </p></td></tr>
+</table></div>
+<p>
+      Second, we still need to check if opening the file succeeded before using it.
+      Since <code class="computeroutput"><a class="link" href="../boost/scope/unique_resource.html" title="Class template unique_resource">unique_resource</a></code>
+      in this example is always constructed in allocated state, we have to check
+      the file descriptor value for being negative. In order to access the resource
+      value one can use the <code class="computeroutput"><span class="identifier">get</span></code> method
+      of <code class="computeroutput"><a class="link" href="../boost/scope/unique_resource.html" title="Class template unique_resource">unique_resource</a></code>.
+    </p>
+<p>
+      We can improve this example by making <code class="computeroutput"><a class="link" href="../boost/scope/unique_resource.html" title="Class template unique_resource">unique_resource</a></code>
+      initialization automatically check for the file descriptor validity.
+    </p>
+<pre class="programlisting"><span class="comment">// A deleter for POSIX-like file descriptors</span>
+<span class="keyword">struct</span> <span class="identifier">fd_deleter</span>
+<span class="special">{</span>
+    <span class="keyword">void</span> <span class="keyword">operator</span><span class="special">()</span> <span class="special">(</span><span class="keyword">int</span> <span class="identifier">fd</span><span class="special">)</span> <span class="keyword">const</span> <span class="keyword">noexcept</span>
+    <span class="special">{</span>
+        <span class="identifier">close</span><span class="special">(</span><span class="identifier">fd</span><span class="special">);</span>
+    <span class="special">}</span>
+<span class="special">};</span>
+
+<span class="comment">// Writes a string to a file</span>
+<span class="keyword">void</span> <span class="identifier">write_string</span><span class="special">(</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">string</span> <span class="keyword">const</span><span class="special">&amp;</span> <span class="identifier">filename</span><span class="special">,</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">string</span> <span class="keyword">const</span><span class="special">&amp;</span> <span class="identifier">str</span><span class="special">)</span>
+<span class="special">{</span>
+    <span class="comment">// Create a unique resource for a file</span>
+    <span class="keyword">auto</span> <span class="identifier">file</span> <span class="special">=</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">scope</span><span class="special">::</span><span class="identifier">make_unique_resource_checked</span><span class="special">(</span>
+        <span class="identifier">open</span><span class="special">(</span><span class="identifier">filename</span><span class="special">.</span><span class="identifier">c_str</span><span class="special">(),</span> <span class="identifier">O_CREAT</span> <span class="special">|</span> <span class="identifier">O_WRONLY</span><span class="special">)</span>
+        <span class="special">-</span><span class="number">1</span><span class="special">,</span>
+        <span class="identifier">fd_deleter</span><span class="special">());</span>
+    <span class="keyword">if</span> <span class="special">(!</span><span class="identifier">file</span><span class="special">.</span><span class="identifier">allocated</span><span class="special">())</span>
+    <span class="special">{</span>
+        <span class="keyword">int</span> <span class="identifier">err</span> <span class="special">=</span> <span class="identifier">errno</span><span class="special">;</span>
+        <span class="keyword">throw</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">system_error</span><span class="special">(</span><span class="identifier">err</span><span class="special">,</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">generic_category</span><span class="special">(),</span> <span class="string">"Failed to open file "</span> <span class="special">+</span> <span class="identifier">filename</span><span class="special">);</span>
+    <span class="special">}</span>
+
+    <span class="comment">// Use it to write data to the file</span>
+    <span class="comment">// ...</span>
+<span class="special">}</span>
+</pre>
+<p>
+      Here, the <code class="computeroutput"><span class="identifier">make_unique_resource_checked</span></code>
+      helper function performs the following:
+    </p>
+<div class="orderedlist"><ol class="orderedlist" type="1">
+<li class="listitem">
+          If the resource value, which is the first argument - the result of the
+          <code class="computeroutput"><span class="identifier">open</span></code> call, is equal to
+          the invalid resource value, which is the second argument, creates and returns
+          an unallocated <code class="computeroutput"><a class="link" href="../boost/scope/unique_resource.html" title="Class template unique_resource">unique_resource</a></code>
+          object.
+        </li>
+<li class="listitem">
+          Otherwise, creates and returns an allocated <code class="computeroutput"><a class="link" href="../boost/scope/unique_resource.html" title="Class template unique_resource">unique_resource</a></code>
+          object that wraps the result of the <code class="computeroutput"><span class="identifier">open</span></code>
+          call.
+        </li>
+<li class="listitem">
+          In both cases, the third argument is used to initialize the deleter in
+          the returned <code class="computeroutput"><a class="link" href="../boost/scope/unique_resource.html" title="Class template unique_resource">unique_resource</a></code>
+          object.
+        </li>
+</ol></div>
+<p>
+      Note that if <code class="computeroutput"><span class="identifier">open</span></code> fails and
+      returns -1, the deleter is guaranteed not to be called on this resource value
+      - neither by <code class="computeroutput"><span class="identifier">make_unique_resource_checked</span></code>
+      nor by <code class="computeroutput"><a class="link" href="../boost/scope/unique_resource.html" title="Class template unique_resource">unique_resource</a></code>,
+      not even if <code class="computeroutput"><a class="link" href="../boost/scope/unique_resource.html" title="Class template unique_resource">unique_resource</a></code>
+      construction fails with an exception. This allows us to simplify <code class="computeroutput"><span class="identifier">fd_deleter</span></code> and remove the check for <code class="computeroutput"><span class="identifier">fd</span></code> being non-negative.
+    </p>
+<p>
+      Furthermore, since the returned <code class="computeroutput"><a class="link" href="../boost/scope/unique_resource.html" title="Class template unique_resource">unique_resource</a></code>
+      object now properly indicates whether the resource is allocated or not, we
+      can use the <code class="computeroutput"><span class="identifier">allocated</span></code> member
+      function to test it instead of checking the resource value. This makes the
+      code more readable.
+    </p>
+<div class="note"><table border="0" summary="Note">
+<tr>
+<td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="../../../../../doc/src/images/note.png"></td>
+<th align="left">Note</th>
+</tr>
+<tr><td align="left" valign="top"><p>
+        In order to avoid confusion with the <code class="computeroutput"><a class="link" href="../boost/scope/unique_resource.html" title="Class template unique_resource">unique_resource</a></code>
+        object being always allocated after construction with a resource value, it
+        is recommended to always use either the <code class="computeroutput"><span class="identifier">make_unique_resource_checked</span></code>
+        factory function or resource traits, as described in the next section.
+      </p></td></tr>
+</table></div>
+<div class="section">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="scope.unique_resource.resource_traits"></a><a class="link" href="unique_resource.html#scope.unique_resource.resource_traits" title="Resource traits">Resource traits</a>
+</h3></div></div></div>
+<p>
+        The <code class="computeroutput"><a class="link" href="../boost/scope/unique_resource.html" title="Class template unique_resource">unique_resource</a></code>
+        class template also supports an optional third template parameter, which
+        can be used to specify a resource traits class. Resource traits provide
+        <code class="computeroutput"><a class="link" href="../boost/scope/unique_resource.html" title="Class template unique_resource">unique_resource</a></code>
+        with additional knowledge about the resource features that allow for a more
+        efficient implementation. This is useful when there is one or more resource
+        value that is considered unallocated, that is such a value that does not
+        identify an allocated resource that needs to be freed. For example, for pointer
+        resource types, null is usually considered as the unallocated value, and
+        for POSIX-like file descriptors, all negative values are unallocated values,
+        since no valid file descriptor can be negative.
+      </p>
+<p>
+        If specified, resource traits must be a class with the following public static
+        member functions:
+      </p>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; ">
+<li class="listitem">
+            <code class="computeroutput"><span class="keyword">bool</span> <span class="identifier">is_allocated</span><span class="special">(</span><span class="identifier">R</span> <span class="keyword">const</span><span class="special">&amp;</span> <span class="identifier">r</span><span class="special">)</span> <span class="keyword">noexcept</span></code> - must return <code class="computeroutput"><span class="keyword">true</span></code>
+            if the resource value <code class="computeroutput"><span class="identifier">r</span></code>
+            is an allocated resource value and <code class="computeroutput"><span class="keyword">false</span></code>
+            otherwise.
+          </li>
+<li class="listitem">
+            <code class="computeroutput"><span class="identifier">R</span> <span class="identifier">make_default</span><span class="special">()</span> <span class="keyword">noexcept</span></code>
+            - must return an unallocated resource value that can be used to initialize
+            the default-constructed <code class="computeroutput"><a class="link" href="../boost/scope/unique_resource.html" title="Class template unique_resource">unique_resource</a></code>
+            object. Note that calling <code class="computeroutput"><span class="identifier">is_allocated</span></code>
+            on the value returned by <code class="computeroutput"><span class="identifier">make_default</span></code>
+            must always return <code class="computeroutput"><span class="keyword">false</span></code>.
+          </li>
+</ul></div>
+<p>
+        Note that all operations must be non-throwing. When the conforming resource
+        traits are provided, <code class="computeroutput"><a class="link" href="../boost/scope/unique_resource.html" title="Class template unique_resource">unique_resource</a></code>
+        behavior changes as follows:
+      </p>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; ">
+<li class="listitem">
+            <code class="computeroutput"><a class="link" href="../boost/scope/unique_resource.html" title="Class template unique_resource">unique_resource</a></code>
+            will no longer separately track whether it is in allocated state or not
+            and instead will use <code class="computeroutput"><span class="identifier">is_allocated</span></code>
+            on the wrapped resource value for this. In particular, this means that
+            constructing <code class="computeroutput"><a class="link" href="../boost/scope/unique_resource.html" title="Class template unique_resource">unique_resource</a></code>
+            from a resource value may now produce a wrapper in an unallocated state,
+            if the resource value is an unallocated value.
+          </li>
+<li class="listitem">
+            Default constructor, <code class="computeroutput"><span class="identifier">reset</span></code>,
+            move constructor and move assignment of <code class="computeroutput"><a class="link" href="../boost/scope/unique_resource.html" title="Class template unique_resource">unique_resource</a></code>
+            will use <code class="computeroutput"><span class="identifier">make_default</span></code>
+            to initialize the resource value in the unallocated wrapper (for move
+            operations - in the move source).
+          </li>
+</ul></div>
+<p>
+        Using the resource traits allow us to further improve the example given in
+        the previous section.
+      </p>
+<pre class="programlisting"><span class="comment">// A deleter for POSIX-like file descriptors</span>
+<span class="keyword">struct</span> <span class="identifier">fd_deleter</span>
+<span class="special">{</span>
+    <span class="keyword">void</span> <span class="keyword">operator</span><span class="special">()</span> <span class="special">(</span><span class="keyword">int</span> <span class="identifier">fd</span><span class="special">)</span> <span class="keyword">const</span> <span class="keyword">noexcept</span>
+    <span class="special">{</span>
+        <span class="identifier">close</span><span class="special">(</span><span class="identifier">fd</span><span class="special">);</span>
+    <span class="special">}</span>
+<span class="special">};</span>
+
+<span class="comment">// Resource traits for POSIX-like file descriptors</span>
+<span class="keyword">struct</span> <span class="identifier">fd_resource_traits</span>
+<span class="special">{</span>
+    <span class="keyword">static</span> <span class="keyword">bool</span> <span class="identifier">is_allocated</span><span class="special">(</span><span class="keyword">int</span> <span class="identifier">fd</span><span class="special">)</span> <span class="keyword">noexcept</span>
+    <span class="special">{</span>
+        <span class="keyword">return</span> <span class="identifier">fd</span> <span class="special">&gt;=</span> <span class="number">0</span><span class="special">;</span>
+    <span class="special">}</span>
+
+    <span class="keyword">static</span> <span class="keyword">bool</span> <span class="identifier">make_default</span><span class="special">()</span> <span class="keyword">noexcept</span>
+    <span class="special">{</span>
+        <span class="comment">// Return any unallocated resource value</span>
+        <span class="keyword">return</span> <span class="special">-</span><span class="number">1</span><span class="special">;</span>
+    <span class="special">}</span>
+<span class="special">};</span>
+
+<span class="comment">// A shorthand typedef for unique file descriptor wrappers</span>
+<span class="keyword">typedef</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">scope</span><span class="special">::</span><span class="identifier">unique_resource</span><span class="special">&lt;</span> <span class="keyword">int</span><span class="special">,</span> <span class="identifier">fd_deleter</span><span class="special">,</span> <span class="identifier">fd_resource_traits</span> <span class="special">&gt;</span> <span class="identifier">unique_fd</span><span class="special">;</span>
+
+<span class="comment">// Writes a string to a file</span>
+<span class="keyword">void</span> <span class="identifier">write_string</span><span class="special">(</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">string</span> <span class="keyword">const</span><span class="special">&amp;</span> <span class="identifier">filename</span><span class="special">,</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">string</span> <span class="keyword">const</span><span class="special">&amp;</span> <span class="identifier">str</span><span class="special">)</span>
+<span class="special">{</span>
+    <span class="comment">// Create a unique resource for a file</span>
+    <span class="identifier">unique_fd</span> <span class="identifier">file</span><span class="special">(</span><span class="identifier">open</span><span class="special">(</span><span class="identifier">filename</span><span class="special">.</span><span class="identifier">c_str</span><span class="special">(),</span> <span class="identifier">O_CREAT</span> <span class="special">|</span> <span class="identifier">O_WRONLY</span><span class="special">));</span>
+    <span class="keyword">if</span> <span class="special">(!</span><span class="identifier">file</span><span class="special">.</span><span class="identifier">allocated</span><span class="special">())</span>
+    <span class="special">{</span>
+        <span class="keyword">int</span> <span class="identifier">err</span> <span class="special">=</span> <span class="identifier">errno</span><span class="special">;</span>
+        <span class="keyword">throw</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">system_error</span><span class="special">(</span><span class="identifier">err</span><span class="special">,</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">generic_category</span><span class="special">(),</span> <span class="string">"Failed to open file "</span> <span class="special">+</span> <span class="identifier">filename</span><span class="special">);</span>
+    <span class="special">}</span>
+
+    <span class="comment">// Use it to write data to the file</span>
+    <span class="comment">// ...</span>
+<span class="special">}</span>
+</pre>
+<p>
+        In this piece of code, we no longer need to use <code class="computeroutput"><span class="identifier">make_unique_resource_checked</span></code>
+        every time we open a file (or otherwise create a file descriptor), and therefore
+        we don't have to duplicate the invalid file descriptor value or the deleter
+        - this information is provided by <code class="computeroutput"><span class="identifier">fd_resource_traits</span></code>
+        and conveniently embedded in the <code class="computeroutput"><span class="identifier">unique_fd</span></code>
+        type. As before, if <code class="computeroutput"><span class="identifier">open</span></code>
+        fails and returns -1, the constructed <code class="computeroutput"><a class="link" href="../boost/scope/unique_resource.html" title="Class template unique_resource">unique_resource</a></code>
+        object will be in an unallocated state, meaning that we can use <code class="computeroutput"><span class="identifier">allocated</span></code> accessor, and that the deleter
+        will only be called if <code class="computeroutput"><span class="identifier">open</span></code>
+        succeeded.
+      </p>
+<div class="tip"><table border="0" summary="Tip">
+<tr>
+<td rowspan="2" align="center" valign="top" width="25"><img alt="[Tip]" src="../../../../../doc/src/images/tip.png"></td>
+<th align="left">Tip</th>
+</tr>
+<tr><td align="left" valign="top"><p>
+          The <code class="computeroutput"><span class="identifier">fd_deleter</span></code>, <code class="computeroutput"><span class="identifier">fd_resource_traits</span></code> and <code class="computeroutput"><span class="identifier">unique_fd</span></code> types presented in the examples
+          above are provided by the library out of the box in <code class="computeroutput"><a class="link" href="../reference.html#header.boost.scope.fd_resource_hpp" title="Header &lt;boost/scope/fd_resource.hpp&gt;">boost/scope/fd_resource.hpp</a></code>
+          and <code class="computeroutput"><a class="link" href="../reference.html#header.boost.scope.unique_fd_hpp" title="Header &lt;boost/scope/unique_fd.hpp&gt;">boost/scope/unique_fd.hpp</a></code>
+          headers.
+        </p></td></tr>
+</table></div>
+</div>
+</div>
+<div class="copyright-footer">Copyright © 2022, 2023 Andrey Semashev<p>
+        Distributed under the Boost Software License, Version 1.0. (See accompanying
+        file LICENSE_1_0.txt or copy at <a href="https://www.boost.org/LICENSE_1_0.txt" target="_top">https://www.boost.org/LICENSE_1_0.txt</a>).
+      </p>
+</div>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="scope_guards.html"><img src="../../../../../doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="../../../../../doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../index.html"><img src="../../../../../doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="../reference.html"><img src="../../../../../doc/src/images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

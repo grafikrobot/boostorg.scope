@@ -1,0 +1,533 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Scope guards</title>
+<link rel="stylesheet" href="../../../../../doc/src/boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets Vsnapshot">
+<link rel="home" href="../index.html" title="Chapter 1. Boost.Scope">
+<link rel="up" href="../index.html" title="Chapter 1. Boost.Scope">
+<link rel="prev" href="install_compat.html" title="Installation and compatibility">
+<link rel="next" href="unique_resource.html" title="Unique resource wrapper">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><tr><td valign="top"><img alt="Boost C++ Libraries" width="277" height="86" src="../../../../../boost.png"></td></tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="install_compat.html"><img src="../../../../../doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="../../../../../doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../index.html"><img src="../../../../../doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="unique_resource.html"><img src="../../../../../doc/src/images/next.png" alt="Next"></a>
+</div>
+<div class="section">
+<div class="titlepage"><div><div><h2 class="title" style="clear: both">
+<a name="scope.scope_guards"></a><a class="link" href="scope_guards.html" title="Scope guards">Scope guards</a>
+</h2></div></div></div>
+<div class="toc"><dl class="toc">
+<dt><span class="section"><a href="scope_guards.html#scope.scope_guards.conditional"><code class="computeroutput"><span class="identifier">scope_exit</span></code>,
+      <code class="computeroutput"><span class="identifier">scope_success</span></code> and <code class="computeroutput"><span class="identifier">scope_fail</span></code></a></span></dt>
+<dt><span class="section"><a href="scope_guards.html#scope.scope_guards.unconditional"><code class="computeroutput"><span class="identifier">scope_final</span></code></a></span></dt>
+<dt><span class="section"><a href="scope_guards.html#scope.scope_guards.runtime_defined">Setting up scope
+      exit actions at run time</a></span></dt>
+</dl></div>
+<p>
+      A scope guard is an object that invokes an arbitrary function object on destruction.
+      Scope guards are useful for implementing actions that need to be reliably performed
+      upon control leaving an execution scope, which is especially helpful for handling
+      exceptions.
+    </p>
+<p>
+      The wrapped function object is specified on the scope guard construction and
+      cannot be changed afterwards. It must be one of:
+    </p>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; ">
+<li class="listitem">
+          a user-defined class with a public <code class="computeroutput"><span class="keyword">operator</span><span class="special">()</span></code> taking no arguments, or
+        </li>
+<li class="listitem">
+          an lvalue reference to such class, or
+        </li>
+<li class="listitem">
+          an lvalue reference to a function taking no arguments.
+        </li>
+</ul></div>
+<p>
+      Note that if the wrapped function is a reference to a function object, that
+      object must be stored externally to the scope guard and must remain valid for
+      the entire lifetime of the scope guard.
+    </p>
+<p>
+      Boost.Scope provides four kinds of scope guards, differing in their features
+      and conditions upon which the function object is called, summarised in the
+      table below.
+    </p>
+<div class="table">
+<a name="scope.scope_guards.scope_guard_comparison"></a><p class="title"><b>Table 1.2. Scope guard comparison</b></p>
+<div class="table-contents"><table class="table" summary="Scope guard comparison">
+<colgroup>
+<col>
+<col>
+<col>
+<col>
+<col>
+</colgroup>
+<thead><tr>
+<th>
+              <p>
+                Feature
+              </p>
+            </th>
+<th>
+              <p>
+                <code class="computeroutput"><a class="link" href="../boost/scope/scope_exit.html" title="Class template scope_exit">scope_exit</a></code>
+              </p>
+            </th>
+<th>
+              <p>
+                <code class="computeroutput"><a class="link" href="../boost/scope/scope_success.html" title="Class template scope_success">scope_success</a></code>
+              </p>
+            </th>
+<th>
+              <p>
+                <code class="computeroutput"><a class="link" href="../boost/scope/scope_fail.html" title="Class template scope_fail">scope_fail</a></code>
+              </p>
+            </th>
+<th>
+              <p>
+                <code class="computeroutput"><a class="link" href="../boost/scope/scope_final.html" title="Class template scope_final">scope_final</a></code>
+              </p>
+            </th>
+</tr></thead>
+<tbody>
+<tr>
+<td>
+              <p>
+                Invokes function on normal scope exit?
+              </p>
+            </td>
+<td>
+              <p>
+                Yes
+              </p>
+            </td>
+<td>
+              <p>
+                Yes
+              </p>
+            </td>
+<td>
+              <p>
+                No
+              </p>
+            </td>
+<td>
+              <p>
+                Yes
+              </p>
+            </td>
+</tr>
+<tr>
+<td>
+              <p>
+                Invokes function on scope exit due to an exception?
+              </p>
+            </td>
+<td>
+              <p>
+                Yes
+              </p>
+            </td>
+<td>
+              <p>
+                No
+              </p>
+            </td>
+<td>
+              <p>
+                Yes
+              </p>
+            </td>
+<td>
+              <p>
+                Yes
+              </p>
+            </td>
+</tr>
+<tr>
+<td>
+              <p>
+                Function may throw?
+              </p>
+            </td>
+<td>
+              <p>
+                Yes
+              </p>
+            </td>
+<td>
+              <p>
+                Yes
+              </p>
+            </td>
+<td>
+              <p>
+                No
+              </p>
+            </td>
+<td>
+              <p>
+                Yes
+              </p>
+            </td>
+</tr>
+<tr>
+<td>
+              <p>
+                Can be (de)activated?
+              </p>
+            </td>
+<td>
+              <p>
+                Yes
+              </p>
+            </td>
+<td>
+              <p>
+                Yes
+              </p>
+            </td>
+<td>
+              <p>
+                Yes
+              </p>
+            </td>
+<td>
+              <p>
+                No
+              </p>
+            </td>
+</tr>
+<tr>
+<td>
+              <p>
+                Move-constructible? (requires function to be move-constructible)
+              </p>
+            </td>
+<td>
+              <p>
+                Yes
+              </p>
+            </td>
+<td>
+              <p>
+                Yes
+              </p>
+            </td>
+<td>
+              <p>
+                Yes
+              </p>
+            </td>
+<td>
+              <p>
+                No
+              </p>
+            </td>
+</tr>
+<tr>
+<td>
+              <p>
+                Has factory function? (C++11-friendly)
+              </p>
+            </td>
+<td>
+              <p>
+                Yes
+              </p>
+            </td>
+<td>
+              <p>
+                Yes
+              </p>
+            </td>
+<td>
+              <p>
+                Yes
+              </p>
+            </td>
+<td>
+              <p>
+                No
+              </p>
+            </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<br class="table-break"><div class="note"><table border="0" summary="Note">
+<tr>
+<td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="../../../../../doc/src/images/note.png"></td>
+<th align="left">Note</th>
+</tr>
+<tr><td align="left" valign="top"><p>
+        Except for <code class="computeroutput"><a class="link" href="../boost/scope/scope_fail.html" title="Class template scope_fail">scope_fail</a></code>,
+        function objects wrapped in scope guards are allowed to throw exceptions
+        upon execution. However, users should remember that <code class="computeroutput"><a class="link" href="../boost/scope/scope_exit.html" title="Class template scope_exit">scope_exit</a></code>
+        and <code class="computeroutput"><a class="link" href="../boost/scope/scope_final.html" title="Class template scope_final">scope_final</a></code> invoke
+        the wrapped function upon exceptions, and throwing an exception from the
+        scope guard in this case will terminate the program. It is user's responsibility
+        to ensure this doesn't happen. This problem doesn't exist for <code class="computeroutput"><a class="link" href="../boost/scope/scope_success.html" title="Class template scope_success">scope_success</a></code> because it doesn't
+        invoke the wrapped function object on exceptions. However, it is generally
+        recommended to use scope guards to implement actions that cannot throw and
+        move all operations that may fail to the normal code flow.
+      </p></td></tr>
+</table></div>
+<div class="section">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="scope.scope_guards.conditional"></a><a class="link" href="scope_guards.html#scope.scope_guards.conditional" title="scope_exit, scope_success and scope_fail"><code class="computeroutput"><span class="identifier">scope_exit</span></code>,
+      <code class="computeroutput"><span class="identifier">scope_success</span></code> and <code class="computeroutput"><span class="identifier">scope_fail</span></code></a>
+</h3></div></div></div>
+<pre class="programlisting"><span class="preprocessor">#include</span> <span class="special">&lt;</span><code class="computeroutput"><a class="link" href="../reference.html#header.boost.scope.scope_exit_hpp" title="Header &lt;boost/scope/scope_exit.hpp&gt;">boost/scope/scope_exit.hpp</a></code><span class="special">&gt;</span>
+<span class="preprocessor">#include</span> <span class="special">&lt;</span><code class="computeroutput"><a class="link" href="../reference.html#header.boost.scope.scope_success_hpp" title="Header &lt;boost/scope/scope_success.hpp&gt;">boost/scope/scope_success.hpp</a></code><span class="special">&gt;</span>
+<span class="preprocessor">#include</span> <span class="special">&lt;</span><code class="computeroutput"><a class="link" href="../reference.html#header.boost.scope.scope_fail_hpp" title="Header &lt;boost/scope/scope_fail.hpp&gt;">boost/scope/scope_fail.hpp</a></code><span class="special">&gt;</span>
+</pre>
+<p>
+        The <code class="computeroutput"><a class="link" href="../boost/scope/scope_exit.html" title="Class template scope_exit">scope_exit</a></code>, <code class="computeroutput"><a class="link" href="../boost/scope/scope_success.html" title="Class template scope_success">scope_success</a></code> and <code class="computeroutput"><a class="link" href="../boost/scope/scope_fail.html" title="Class template scope_fail">scope_fail</a></code> scope guards provide
+        similar interfaces and capabilities and only differ in conditions when they
+        invoke the wrapped function object. As shown in the table above, <code class="computeroutput"><a class="link" href="../boost/scope/scope_success.html" title="Class template scope_success">scope_success</a></code> only invokes
+        the function object if it is destroyed normally, <code class="computeroutput"><a class="link" href="../boost/scope/scope_fail.html" title="Class template scope_fail">scope_fail</a></code>
+        - if it is destroyed due to an exception being thrown, and <code class="computeroutput"><a class="link" href="../boost/scope/scope_exit.html" title="Class template scope_exit">scope_exit</a></code>
+        acts regardless of the exception status.
+      </p>
+<p>
+        In addition to the exception status, each of the scope guards supports active
+        and inactive state. The wrapped function object will only be called if the
+        scope guard is in active state while being destroyed. By default, scope guards
+        are created in active state, but this can be changed by passing <code class="computeroutput"><span class="keyword">false</span></code> as the second argument for the constructor.
+        Scope guards can also be deactivated or re-activated during their lifetime,
+        which can be useful if the scope guard needs to be activated based on some
+        condition.
+      </p>
+<pre class="programlisting"><span class="keyword">class</span> <span class="identifier">collection</span>
+<span class="special">{</span>
+    <span class="identifier">std</span><span class="special">::</span><span class="identifier">set</span><span class="special">&lt;</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">shared_ptr</span><span class="special">&lt;</span> <span class="identifier">object</span> <span class="special">&gt;</span> <span class="special">&gt;</span> <span class="identifier">objects</span><span class="special">;</span>
+
+<span class="keyword">public</span><span class="special">:</span>
+    <span class="keyword">void</span> <span class="identifier">add_object</span><span class="special">(</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">shared_ptr</span><span class="special">&lt;</span> <span class="identifier">object</span> <span class="special">&gt;</span> <span class="keyword">const</span><span class="special">&amp;</span> <span class="identifier">obj</span><span class="special">)</span>
+    <span class="special">{</span>
+        <span class="comment">// Create a deactivated scope guard initially</span>
+        <span class="identifier">std</span><span class="special">::</span><span class="identifier">set</span><span class="special">&lt;</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">shared_ptr</span><span class="special">&lt;</span> <span class="identifier">object</span> <span class="special">&gt;</span> <span class="special">&gt;::</span><span class="identifier">iterator</span> <span class="identifier">it</span><span class="special">;</span>
+        <span class="identifier">boost</span><span class="special">::</span><span class="identifier">scope</span><span class="special">::</span><span class="identifier">scope_fail</span> <span class="identifier">rollback_guard</span><span class="special">{[&amp;,</span> <span class="keyword">this</span><span class="special">]</span>
+        <span class="special">{</span>
+            <span class="identifier">objects</span><span class="special">.</span><span class="identifier">erase</span><span class="special">(</span><span class="identifier">it</span><span class="special">);</span>
+        <span class="special">},</span>
+        <span class="keyword">false</span><span class="special">};</span>
+
+        <span class="keyword">bool</span> <span class="identifier">inserted</span><span class="special">;</span>
+        <span class="identifier">std</span><span class="special">::</span><span class="identifier">tie</span><span class="special">(</span><span class="identifier">it</span><span class="special">,</span> <span class="identifier">inserted</span><span class="special">)</span> <span class="special">=</span> <span class="identifier">objects</span><span class="special">.</span><span class="identifier">insert</span><span class="special">(</span><span class="identifier">obj</span><span class="special">);</span>
+        <span class="keyword">if</span> <span class="special">(</span><span class="identifier">inserted</span><span class="special">)</span>
+        <span class="special">{</span>
+            <span class="comment">// Activate rollback guard</span>
+            <span class="identifier">rollback_guard</span><span class="special">.</span><span class="identifier">set_active</span><span class="special">(</span><span class="keyword">true</span><span class="special">);</span>
+        <span class="special">}</span>
+
+        <span class="identifier">obj</span><span class="special">-&gt;</span><span class="identifier">on_added_to_collection</span><span class="special">(*</span><span class="keyword">this</span><span class="special">);</span>
+    <span class="special">}</span>
+<span class="special">};</span>
+</pre>
+<p>
+        The code sample above relies on C++17 <a href="https://en.cppreference.com/w/cpp/language/class_template_argument_deduction" target="_top">class
+        template argument deduction (CTAD)</a> for <code class="computeroutput"><span class="identifier">scope_fail</span></code>
+        to deduce the function object type (which is the lambda). If this feature
+        is not available, the scope guard construction can be rewritten using a factory
+        function, like this:
+      </p>
+<pre class="programlisting"><span class="keyword">auto</span> <span class="identifier">rollback_guard</span> <span class="special">=</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">scope</span><span class="special">::</span><span class="identifier">make_scope_fail</span><span class="special">([&amp;,</span> <span class="keyword">this</span><span class="special">]</span>
+<span class="special">{</span>
+    <span class="identifier">objects</span><span class="special">.</span><span class="identifier">erase</span><span class="special">(</span><span class="identifier">it</span><span class="special">);</span>
+<span class="special">},</span>
+<span class="keyword">false</span><span class="special">);</span>
+</pre>
+<p>
+        Factory functions are provided for each of the three scope guards described
+        in this section and are compatible with C++11.
+      </p>
+<p>
+        Scope guards described in this section are move-constructible (but not assignable),
+        which requires the wrapped function objects to be move- or copy-constructible
+        as well. After moving, the moved-from scope guard becomes inactive. If a
+        moved-from scope guard is active on destruction, the behavior is undefined.
+      </p>
+</div>
+<div class="section">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="scope.scope_guards.unconditional"></a><a class="link" href="scope_guards.html#scope.scope_guards.unconditional" title="scope_final"><code class="computeroutput"><span class="identifier">scope_final</span></code></a>
+</h3></div></div></div>
+<pre class="programlisting"><span class="preprocessor">#include</span> <span class="special">&lt;</span><code class="computeroutput"><a class="link" href="../reference.html#header.boost.scope.scope_final_hpp" title="Header &lt;boost/scope/scope_final.hpp&gt;">boost/scope/scope_final.hpp</a></code><span class="special">&gt;</span>
+</pre>
+<p>
+        The <code class="computeroutput"><a class="link" href="../boost/scope/scope_final.html" title="Class template scope_final">scope_final</a></code> scope
+        guard is similar to <code class="computeroutput"><a class="link" href="../boost/scope/scope_exit.html" title="Class template scope_exit">scope_exit</a></code>
+        in terms of when it invokes the wrapped function. But it lacks support for
+        moveability and activation/deactivation - this scope guard is always active
+        upon construction. This allows to implement it more efficiently when these
+        features are not needed.
+      </p>
+<div class="note"><table border="0" summary="Note">
+<tr>
+<td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="../../../../../doc/src/images/note.png"></td>
+<th align="left">Note</th>
+</tr>
+<tr><td align="left" valign="top"><p>
+          <code class="computeroutput"><a class="link" href="../boost/scope/scope_final.html" title="Class template scope_final">scope_final</a></code> is a
+          more lightweight version of <code class="computeroutput"><a class="link" href="../boost/scope/scope_exit.html" title="Class template scope_exit">scope_exit</a></code>,
+          similar to how <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">lock_guard</span></code> is a more lightweight version
+          of <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">unique_lock</span></code>.
+        </p></td></tr>
+</table></div>
+<p>
+        Since <code class="computeroutput"><a class="link" href="../boost/scope/scope_final.html" title="Class template scope_final">scope_final</a></code>
+        effectively provides no interface to interact with after construction, it
+        is better suited for anonymous "set up and forget" kind of scope
+        guards. To reinforce this affinity, the library provides a <code class="computeroutput"><span class="identifier">BOOST_SCOPE_FINAL</span></code> macro, which acts as
+        a keyword defining a uniquely named <code class="computeroutput"><a class="link" href="../boost/scope/scope_final.html" title="Class template scope_final">scope_final</a></code>
+        scope guard. The macro should be followed by the function object to be invoked
+        on scope exit.
+      </p>
+<pre class="programlisting"><span class="identifier">BOOST_SCOPE_FINAL</span> <span class="special">[]</span>
+<span class="special">{</span>
+    <span class="identifier">std</span><span class="special">::</span><span class="identifier">cout</span> <span class="special">&lt;&lt;</span> <span class="string">"Hello world!"</span> <span class="special">&lt;&lt;</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">endl</span><span class="special">;</span>
+<span class="special">};</span>
+</pre>
+<div class="note"><table border="0" summary="Note">
+<tr>
+<td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="../../../../../doc/src/images/note.png"></td>
+<th align="left">Note</th>
+</tr>
+<tr><td align="left" valign="top"><p>
+          <code class="computeroutput"><span class="identifier">BOOST_SCOPE_FINAL</span></code> requires
+          support for C++17 <a href="https://en.cppreference.com/w/cpp/language/class_template_argument_deduction" target="_top">CTAD</a>.
+          The <code class="computeroutput"><a class="link" href="../boost/scope/scope_final.html" title="Class template scope_final">scope_final</a></code>
+          class itself is compatible with C++11, but given that there is no factory
+          function for it, C++17 support is very much desired.
+        </p></td></tr>
+</table></div>
+<p>
+        As you can see, <code class="computeroutput"><span class="identifier">BOOST_SCOPE_FINAL</span></code>
+        offers a few syntax improvements over the other scope guard declarations:
+      </p>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; ">
+<li class="listitem">
+            The declaration does not name a scope guard variable, meaning one does
+            not need to invent one.
+          </li>
+<li class="listitem">
+            The declaration is generally shorter to type and easier to spot.
+          </li>
+<li class="listitem">
+            There are no extra parenthesis or curly brackets around the function
+            object.
+          </li>
+</ul></div>
+</div>
+<div class="section">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="scope.scope_guards.runtime_defined"></a><a class="link" href="scope_guards.html#scope.scope_guards.runtime_defined" title="Setting up scope exit actions at run time">Setting up scope
+      exit actions at run time</a>
+</h3></div></div></div>
+<p>
+        It is possible to use scope guard classes to implement scope exit actions
+        that are initialized at run time. To implement this, one could use a function
+        object wrapper such as <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">function</span></code>
+        together with the scope guard to schedule the function call. For example:
+      </p>
+<pre class="programlisting"><span class="keyword">using</span> <span class="identifier">cleanup_func_t</span> <span class="special">=</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">function</span><span class="special">&lt;</span> <span class="keyword">void</span><span class="special">()</span> <span class="special">&gt;;</span>
+<span class="comment">// Create an inactive scope guard first, since the cleanup function is not set yet</span>
+<span class="identifier">boost</span><span class="special">::</span><span class="identifier">scope</span><span class="special">::</span><span class="identifier">scope_exit</span><span class="special">&lt;</span> <span class="identifier">cleanup_func_t</span> <span class="special">&gt;</span> <span class="identifier">cleanup</span><span class="special">(</span><span class="identifier">cleanup_func_t</span><span class="special">(),</span> <span class="keyword">false</span><span class="special">);</span>
+
+<span class="comment">// Later in the program, initialize the scope guard with the function selected at run time</span>
+<span class="keyword">if</span> <span class="special">(</span><span class="identifier">cond</span><span class="special">)</span>
+<span class="special">{</span>
+    <span class="identifier">cleanup</span> <span class="special">=</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">scope</span><span class="special">::</span><span class="identifier">scope_exit</span><span class="special">&lt;</span> <span class="identifier">cleanup_func_t</span> <span class="special">&gt;([]</span>
+    <span class="special">{</span>
+        <span class="identifier">std</span><span class="special">::</span><span class="identifier">cout</span> <span class="special">&lt;&lt;</span> <span class="string">"cond is true"</span> <span class="special">&lt;&lt;</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">endl</span><span class="special">;</span>
+    <span class="special">});</span>
+<span class="special">}</span>
+<span class="keyword">else</span>
+<span class="special">{</span>
+    <span class="identifier">cleanup</span> <span class="special">=</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">scope</span><span class="special">::</span><span class="identifier">scope_exit</span><span class="special">&lt;</span> <span class="identifier">cleanup_func_t</span> <span class="special">&gt;([]</span>
+    <span class="special">{</span>
+        <span class="identifier">std</span><span class="special">::</span><span class="identifier">cout</span> <span class="special">&lt;&lt;</span> <span class="string">"cond is false"</span> <span class="special">&lt;&lt;</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">endl</span><span class="special">;</span>
+    <span class="special">});</span>
+<span class="special">}</span>
+</pre>
+<p>
+        It is also possible to do this with <code class="computeroutput"><span class="identifier">BOOST_SCOPE_FINAL</span></code>,
+        although it eliminates one of the advantages provided by this macro, namely
+        not having to invent a variable name. Also note that the function wrapper
+        must be valid at all times once the scope guard is constructed.
+      </p>
+<pre class="programlisting"><span class="comment">// Create a non-empty function wrapper that does nothing</span>
+<span class="identifier">std</span><span class="special">::</span><span class="identifier">function</span><span class="special">&lt;</span> <span class="keyword">void</span><span class="special">()</span> <span class="special">&gt;</span> <span class="identifier">cleanup_func</span> <span class="special">=</span> <span class="special">[]</span> <span class="special">{};</span>
+<span class="comment">// Create a scope guard that refers to the function wrapper</span>
+<span class="identifier">BOOST_SCOPE_FINAL</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">ref</span><span class="special">(</span><span class="identifier">cleanup_func</span><span class="special">);</span>
+
+<span class="comment">// Later in the program, initialize the function wrapper</span>
+<span class="keyword">if</span> <span class="special">(</span><span class="identifier">cond</span><span class="special">)</span>
+<span class="special">{</span>
+    <span class="identifier">cleanup_func</span> <span class="special">=</span> <span class="special">[]</span>
+    <span class="special">{</span>
+        <span class="identifier">std</span><span class="special">::</span><span class="identifier">cout</span> <span class="special">&lt;&lt;</span> <span class="string">"cond is true"</span> <span class="special">&lt;&lt;</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">endl</span><span class="special">;</span>
+    <span class="special">};</span>
+<span class="special">}</span>
+<span class="keyword">else</span>
+<span class="special">{</span>
+    <span class="identifier">cleanup_func</span> <span class="special">=</span> <span class="special">[]</span>
+    <span class="special">{</span>
+        <span class="identifier">std</span><span class="special">::</span><span class="identifier">cout</span> <span class="special">&lt;&lt;</span> <span class="string">"cond is false"</span> <span class="special">&lt;&lt;</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">endl</span><span class="special">;</span>
+    <span class="special">};</span>
+<span class="special">}</span>
+</pre>
+<p>
+        However, when setting up scope exit actions at run time like that, users
+        should be aware that function wrappers typically use dynamic memory allocation
+        internally and copy the function object data, which may involve calling copy
+        constructors that may also fail with an exception. Although many standard
+        library implementations use small object optimization for <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">function</span></code>,
+        and this technique is also used in other implementations like <a href="https://www.boost.org/doc/libs/release/doc/html/function.html" target="_top">Boost.Function</a>,
+        it is generally not guaranteed that initializing the function wrapper with
+        a given function object will not throw. If setting up the scope exit action
+        needs to be a non-throwing operation (for example, if the scope guard is
+        supposed to revert the effects of the immediately preceding operation), it
+        is recommended to initialize inactive scope guards beforehand and only activate
+        one of them at a later point in the program.
+      </p>
+<pre class="programlisting"><span class="comment">// Create inactive scope guards for both branches</span>
+<span class="identifier">boost</span><span class="special">::</span><span class="identifier">scope</span><span class="special">::</span><span class="identifier">scope_exit</span> <span class="identifier">cleanup_true</span><span class="special">([]</span>
+<span class="special">{</span>
+    <span class="identifier">std</span><span class="special">::</span><span class="identifier">cout</span> <span class="special">&lt;&lt;</span> <span class="string">"cond is true"</span> <span class="special">&lt;&lt;</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">endl</span><span class="special">;</span>
+<span class="special">},</span>
+<span class="keyword">false</span><span class="special">);</span>
+<span class="identifier">boost</span><span class="special">::</span><span class="identifier">scope</span><span class="special">::</span><span class="identifier">scope_exit</span> <span class="identifier">cleanup_false</span><span class="special">([]</span>
+<span class="special">{</span>
+    <span class="identifier">std</span><span class="special">::</span><span class="identifier">cout</span> <span class="special">&lt;&lt;</span> <span class="string">"cond is false"</span> <span class="special">&lt;&lt;</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">endl</span><span class="special">;</span>
+<span class="special">},</span>
+<span class="keyword">false</span><span class="special">);</span>
+
+<span class="comment">// Later in the program, activate one of the scope guards.</span>
+<span class="comment">// This won't throw.</span>
+<span class="keyword">if</span> <span class="special">(</span><span class="identifier">cond</span><span class="special">)</span>
+    <span class="identifier">cleanup_true</span><span class="special">.</span><span class="identifier">set_active</span><span class="special">(</span><span class="keyword">true</span><span class="special">);</span>
+<span class="keyword">else</span>
+    <span class="identifier">cleanup_false</span><span class="special">.</span><span class="identifier">set_active</span><span class="special">(</span><span class="keyword">true</span><span class="special">);</span>
+</pre>
+</div>
+</div>
+<div class="copyright-footer">Copyright © 2022, 2023 Andrey Semashev<p>
+        Distributed under the Boost Software License, Version 1.0. (See accompanying
+        file LICENSE_1_0.txt or copy at <a href="https://www.boost.org/LICENSE_1_0.txt" target="_top">https://www.boost.org/LICENSE_1_0.txt</a>).
+      </p>
+</div>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="install_compat.html"><img src="../../../../../doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="../../../../../doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../index.html"><img src="../../../../../doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="unique_resource.html"><img src="../../../../../doc/src/images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

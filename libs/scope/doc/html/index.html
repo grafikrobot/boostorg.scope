@@ -1,0 +1,290 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Chapter 1. Boost.Scope</title>
+<link rel="stylesheet" href="../../../../doc/src/boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets Vsnapshot">
+<link rel="home" href="index.html" title="Chapter 1. Boost.Scope">
+<link rel="next" href="scope/install_compat.html" title="Installation and compatibility">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><tr><td valign="top"><img alt="Boost C++ Libraries" width="277" height="86" src="../../../../boost.png"></td></tr></table>
+<hr>
+<div class="spirit-nav"><a accesskey="n" href="scope/install_compat.html"><img src="../../../../doc/src/images/next.png" alt="Next"></a></div>
+<div class="chapter">
+<div class="titlepage"><div>
+<div><h2 class="title">
+<a name="scope"></a>Chapter 1. Boost.Scope</h2></div>
+<div><div class="author"><h3 class="author">
+<span class="firstname">Andrey</span> <span class="surname">Semashev</span>
+</h3></div></div>
+<div><p class="copyright">Copyright © 2022, 2023 Andrey Semashev</p></div>
+<div><div class="legalnotice">
+<a name="scope.legal"></a><p>
+        Distributed under the Boost Software License, Version 1.0. (See accompanying
+        file LICENSE_1_0.txt or copy at <a href="https://www.boost.org/LICENSE_1_0.txt" target="_top">https://www.boost.org/LICENSE_1_0.txt</a>).
+      </p>
+</div></div>
+</div></div>
+<div class="toc">
+<p><b>Table of Contents</b></p>
+<dl class="toc">
+<dt><span class="section"><a href="index.html#scope.intro">Introduction</a></span></dt>
+<dt><span class="section"><a href="scope/install_compat.html">Installation and compatibility</a></span></dt>
+<dt><span class="section"><a href="scope/scope_guards.html">Scope guards</a></span></dt>
+<dd><dl>
+<dt><span class="section"><a href="scope/scope_guards.html#scope.scope_guards.conditional"><code class="computeroutput"><span class="identifier">scope_exit</span></code>,
+      <code class="computeroutput"><span class="identifier">scope_success</span></code> and <code class="computeroutput"><span class="identifier">scope_fail</span></code></a></span></dt>
+<dt><span class="section"><a href="scope/scope_guards.html#scope.scope_guards.unconditional"><code class="computeroutput"><span class="identifier">scope_final</span></code></a></span></dt>
+<dt><span class="section"><a href="scope/scope_guards.html#scope.scope_guards.runtime_defined">Setting up scope
+      exit actions at run time</a></span></dt>
+</dl></dd>
+<dt><span class="section"><a href="scope/unique_resource.html">Unique resource wrapper</a></span></dt>
+<dd><dl><dt><span class="section"><a href="scope/unique_resource.html#scope.unique_resource.resource_traits">Resource traits</a></span></dt></dl></dd>
+<dt><span class="section"><a href="reference.html">Reference</a></span></dt>
+<dd><dl>
+<dt><span class="section"><a href="reference.html#header.boost.scope.fd_resource_hpp">Header &lt;boost/scope/fd_resource.hpp&gt;</a></span></dt>
+<dt><span class="section"><a href="reference.html#header.boost.scope.scope_exit_hpp">Header &lt;boost/scope/scope_exit.hpp&gt;</a></span></dt>
+<dt><span class="section"><a href="reference.html#header.boost.scope.scope_fail_hpp">Header &lt;boost/scope/scope_fail.hpp&gt;</a></span></dt>
+<dt><span class="section"><a href="reference.html#header.boost.scope.scope_final_hpp">Header &lt;boost/scope/scope_final.hpp&gt;</a></span></dt>
+<dt><span class="section"><a href="reference.html#header.boost.scope.scope_success_hpp">Header &lt;boost/scope/scope_success.hpp&gt;</a></span></dt>
+<dt><span class="section"><a href="reference.html#header.boost.scope.unique_fd_hpp">Header &lt;boost/scope/unique_fd.hpp&gt;</a></span></dt>
+<dt><span class="section"><a href="reference.html#header.boost.scope.unique_resource_hpp">Header &lt;boost/scope/unique_resource.hpp&gt;</a></span></dt>
+<dt><span class="section"><a href="reference.html#header.boost.scope.unique_resource_fwd_hpp">Header &lt;boost/scope/unique_resource_fwd.hpp&gt;</a></span></dt>
+</dl></dd>
+<dt><span class="section"><a href="scope/changelog.html">Changelog</a></span></dt>
+</dl>
+</div>
+<div class="section">
+<div class="titlepage"><div><div><h2 class="title" style="clear: both">
+<a name="scope.intro"></a><a class="link" href="index.html#scope.intro" title="Introduction">Introduction</a>
+</h2></div></div></div>
+<p>
+      The Boost.Scope library is a collection of utilities helping code execution
+      upon leaving a scope and automatic resource management. The library contains
+      components that were defined in the <a href="https://cplusplus.github.io/fundamentals-ts/v3.html" target="_top">C++
+      Extensions for Library Fundamentals, Version 3</a> technical specification,
+      in the <a href="https://cplusplus.github.io/fundamentals-ts/v3.html#scope.syn" target="_top"><code class="computeroutput"><span class="special">&lt;</span><span class="identifier">experimental</span><span class="special">/</span><span class="identifier">scope</span><span class="special">&gt;</span></code></a>
+      standard library header. The library also contains extensions to the Fundamentals
+      TS that improve usability or efficiency of the components.
+    </p>
+<p>
+      The components provided by the library can be divided into two categories:
+    </p>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; ">
+<li class="listitem">
+          A set of scope guards that allow executing arbitrary code when the scope
+          guard is destroyed,
+        </li>
+<li class="listitem">
+          A generic resource wrapper that automatically frees the owned resource
+          upon destruction.
+        </li>
+</ul></div>
+<p>
+      There is some overlap in terms of functionality with <a href="https://www.boost.org/doc/libs/release/libs/scope_exit/doc/html/index.html" target="_top">Boost.ScopeExit</a>,
+      <a href="https://www.boost.org/doc/libs/release/libs/smart_ptr/doc/html/smart_ptr.html" target="_top">Boost.SmartPtr</a>
+      as well as C++ standard library smart-pointers. <a href="https://www.boost.org/doc/libs/release/libs/scope_exit/doc/html/index.html" target="_top">Boost.ScopeExit</a>
+      defines a set of macros for defining code blocks to be executed at scope exit.
+      Scope guards provided by Boost.Scope provide similar functionality, but with
+      simpler syntax and new features. You can see the syntax differences in the
+      table below:
+    </p>
+<div class="table">
+<a name="scope.intro.boost_scope_exit_and_boost_scope"></a><p class="title"><b>Table 1.1. <a href="https://www.boost.org/doc/libs/release/libs/scope_exit/doc/html/index.html" target="_top">Boost.ScopeExit</a>
+      and Boost.Scope comparison</b></p>
+<div class="table-contents"><table class="table" summary="Boost.ScopeExit
+      and Boost.Scope comparison">
+<colgroup>
+<col>
+<col>
+<col>
+</colgroup>
+<thead><tr>
+<th>
+              <p>
+                <a href="https://www.boost.org/doc/libs/release/libs/scope_exit/doc/html/index.html" target="_top">Boost.ScopeExit</a>
+                (C++03)
+              </p>
+            </th>
+<th>
+              <p>
+                Boost.Scope (C++11)
+              </p>
+            </th>
+<th>
+              <p>
+                Boost.Scope (C++17)
+              </p>
+            </th>
+</tr></thead>
+<tbody>
+<tr>
+<td>
+<pre class="programlisting"><span class="keyword">class</span> <span class="identifier">adder</span>
+<span class="special">{</span>
+    <span class="keyword">int</span> <span class="identifier">x</span><span class="special">,</span> <span class="identifier">y</span><span class="special">;</span>
+
+<span class="keyword">public</span><span class="special">:</span>
+    <span class="keyword">int</span> <span class="identifier">compute</span><span class="special">()</span>
+    <span class="special">{</span>
+        <span class="comment">// Reset variables on return</span>
+        <span class="identifier">BOOST_SCOPE_EXIT</span><span class="special">(</span><span class="identifier">this_</span><span class="special">)</span>
+        <span class="special">{</span>
+            <span class="identifier">this_</span><span class="special">-&gt;</span><span class="identifier">x</span> <span class="special">=</span> <span class="number">0</span><span class="special">;</span>
+            <span class="identifier">this_</span><span class="special">-&gt;</span><span class="identifier">y</span> <span class="special">=</span> <span class="number">0</span><span class="special">;</span>
+        <span class="special">}</span>
+        <span class="identifier">BOOST_SCOPE_EXIT_END</span><span class="special">;</span>
+
+        <span class="keyword">return</span> <span class="identifier">x</span> <span class="special">+</span> <span class="identifier">y</span><span class="special">;</span>
+    <span class="special">}</span>
+<span class="special">};</span>
+</pre>
+            </td>
+<td>
+<pre class="programlisting"><span class="keyword">class</span> <span class="identifier">adder</span>
+<span class="special">{</span>
+    <span class="keyword">int</span> <span class="identifier">x</span><span class="special">,</span> <span class="identifier">y</span><span class="special">;</span>
+
+<span class="keyword">public</span><span class="special">:</span>
+    <span class="keyword">int</span> <span class="identifier">compute</span><span class="special">()</span>
+    <span class="special">{</span>
+        <span class="comment">// Reset variables on return</span>
+        <span class="keyword">auto</span> <span class="identifier">cleanup</span> <span class="special">=</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">scope</span><span class="special">::</span><span class="identifier">make_scope_exit</span><span class="special">([</span><span class="keyword">this</span><span class="special">]</span>
+        <span class="special">{</span>
+            <span class="identifier">x</span> <span class="special">=</span> <span class="number">0</span><span class="special">;</span>
+            <span class="identifier">y</span> <span class="special">=</span> <span class="number">0</span><span class="special">;</span>
+        <span class="special">});</span>
+
+        <span class="keyword">return</span> <span class="identifier">x</span> <span class="special">+</span> <span class="identifier">y</span><span class="special">;</span>
+    <span class="special">}</span>
+<span class="special">};</span>
+</pre>
+            </td>
+<td>
+<pre class="programlisting"><span class="keyword">class</span> <span class="identifier">adder</span>
+<span class="special">{</span>
+    <span class="keyword">int</span> <span class="identifier">x</span><span class="special">,</span> <span class="identifier">y</span><span class="special">;</span>
+
+<span class="keyword">public</span><span class="special">:</span>
+    <span class="keyword">int</span> <span class="identifier">compute</span><span class="special">()</span>
+    <span class="special">{</span>
+        <span class="comment">// Reset variables on return</span>
+        <span class="identifier">BOOST_SCOPE_FINAL</span> <span class="special">[</span><span class="keyword">this</span><span class="special">]</span>
+        <span class="special">{</span>
+            <span class="identifier">x</span> <span class="special">=</span> <span class="number">0</span><span class="special">;</span>
+            <span class="identifier">y</span> <span class="special">=</span> <span class="number">0</span><span class="special">;</span>
+        <span class="special">};</span>
+
+        <span class="keyword">return</span> <span class="identifier">x</span> <span class="special">+</span> <span class="identifier">y</span><span class="special">;</span>
+    <span class="special">}</span>
+<span class="special">};</span>
+</pre>
+            </td>
+</tr>
+<tr>
+<td>
+<pre class="programlisting"><span class="keyword">template</span><span class="special">&lt;</span> <span class="keyword">typename</span> <span class="identifier">Object</span> <span class="special">&gt;</span>
+<span class="keyword">class</span> <span class="identifier">collection</span>
+<span class="special">{</span>
+    <span class="identifier">std</span><span class="special">::</span><span class="identifier">set</span><span class="special">&lt;</span> <span class="identifier">Object</span> <span class="special">&gt;</span> <span class="identifier">objects</span><span class="special">;</span>
+
+<span class="keyword">public</span><span class="special">:</span>
+    <span class="keyword">template</span><span class="special">&lt;</span> <span class="keyword">typename</span> <span class="identifier">T</span> <span class="special">&gt;</span>
+    <span class="keyword">void</span> <span class="identifier">add_object</span><span class="special">(</span><span class="identifier">T</span> <span class="keyword">const</span><span class="special">&amp;</span> <span class="identifier">arg</span><span class="special">)</span>
+    <span class="special">{</span>
+        <span class="keyword">typename</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">set</span><span class="special">&lt;</span> <span class="identifier">Object</span> <span class="special">&gt;::</span><span class="identifier">iterator</span> <span class="identifier">it</span> <span class="special">=</span>
+            <span class="identifier">objects</span><span class="special">.</span><span class="identifier">insert</span><span class="special">(</span><span class="identifier">Object</span><span class="special">());</span>
+
+        <span class="comment">// Remove the object on failure</span>
+        <span class="keyword">unsigned</span> <span class="keyword">int</span> <span class="identifier">uncaught_count</span> <span class="special">=</span>
+            <span class="identifier">boost</span><span class="special">::</span><span class="identifier">core</span><span class="special">::</span><span class="identifier">uncaught_exceptions</span><span class="special">();</span>
+        <span class="identifier">BOOST_SCOPE_EXIT_TPL</span><span class="special">(</span><span class="identifier">this_</span><span class="special">,</span> <span class="identifier">it</span><span class="special">,</span> <span class="identifier">uncaught_count</span><span class="special">)</span>
+        <span class="special">{</span>
+            <span class="keyword">if</span> <span class="special">(</span><span class="identifier">uncaught_count</span> <span class="special">!=</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">core</span><span class="special">::</span><span class="identifier">uncaught_exceptions</span><span class="special">())</span>
+                <span class="identifier">this_</span><span class="special">-&gt;</span><span class="identifier">objects</span><span class="special">.</span><span class="identifier">erase</span><span class="special">(</span><span class="identifier">it</span><span class="special">);</span>
+        <span class="special">}</span>
+        <span class="identifier">BOOST_SCOPE_EXIT_END</span><span class="special">;</span>
+
+        <span class="comment">// Throws on error</span>
+        <span class="identifier">it</span><span class="special">-&gt;</span><span class="identifier">activate</span><span class="special">(</span><span class="identifier">arg</span><span class="special">);</span>
+    <span class="special">}</span>
+<span class="special">};</span>
+</pre>
+            </td>
+<td>
+<pre class="programlisting"><span class="keyword">template</span><span class="special">&lt;</span> <span class="keyword">typename</span> <span class="identifier">Object</span> <span class="special">&gt;</span>
+<span class="keyword">class</span> <span class="identifier">collection</span>
+<span class="special">{</span>
+    <span class="identifier">std</span><span class="special">::</span><span class="identifier">set</span><span class="special">&lt;</span> <span class="identifier">Object</span> <span class="special">&gt;</span> <span class="identifier">objects</span><span class="special">;</span>
+
+<span class="keyword">public</span><span class="special">:</span>
+    <span class="keyword">template</span><span class="special">&lt;</span> <span class="keyword">typename</span> <span class="identifier">T</span> <span class="special">&gt;</span>
+    <span class="keyword">void</span> <span class="identifier">add_object</span><span class="special">(</span><span class="identifier">T</span><span class="special">&amp;&amp;</span> <span class="identifier">arg</span><span class="special">)</span>
+    <span class="special">{</span>
+        <span class="keyword">auto</span> <span class="identifier">it</span> <span class="special">=</span> <span class="identifier">objects</span><span class="special">.</span><span class="identifier">emplace</span><span class="special">();</span>
+
+        <span class="comment">// Remove the object on failure</span>
+        <span class="keyword">auto</span> <span class="identifier">cleanup</span> <span class="special">=</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">scope</span><span class="special">::</span><span class="identifier">make_scope_fail</span><span class="special">([</span><span class="keyword">this</span><span class="special">,</span> <span class="identifier">it</span><span class="special">]</span>
+        <span class="special">{</span>
+            <span class="identifier">objects</span><span class="special">.</span><span class="identifier">erase</span><span class="special">(</span><span class="identifier">it</span><span class="special">);</span>
+        <span class="special">});</span>
+
+        <span class="comment">// Throws on error</span>
+        <span class="identifier">it</span><span class="special">-&gt;</span><span class="identifier">activate</span><span class="special">(</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">forward</span><span class="special">&lt;</span> <span class="identifier">T</span> <span class="special">&gt;(</span><span class="identifier">arg</span><span class="special">));</span>
+    <span class="special">}</span>
+<span class="special">};</span>
+</pre>
+            </td>
+<td>
+<pre class="programlisting"><span class="keyword">template</span><span class="special">&lt;</span> <span class="keyword">typename</span> <span class="identifier">Object</span> <span class="special">&gt;</span>
+<span class="keyword">class</span> <span class="identifier">collection</span>
+<span class="special">{</span>
+    <span class="identifier">std</span><span class="special">::</span><span class="identifier">set</span><span class="special">&lt;</span> <span class="identifier">Object</span> <span class="special">&gt;</span> <span class="identifier">objects</span><span class="special">;</span>
+
+<span class="keyword">public</span><span class="special">:</span>
+    <span class="keyword">template</span><span class="special">&lt;</span> <span class="keyword">typename</span> <span class="identifier">T</span> <span class="special">&gt;</span>
+    <span class="keyword">void</span> <span class="identifier">add_object</span><span class="special">(</span><span class="identifier">T</span><span class="special">&amp;&amp;</span> <span class="identifier">arg</span><span class="special">)</span>
+    <span class="special">{</span>
+        <span class="keyword">auto</span> <span class="identifier">it</span> <span class="special">=</span> <span class="identifier">objects</span><span class="special">.</span><span class="identifier">emplace</span><span class="special">();</span>
+
+        <span class="comment">// Remove the object on failure</span>
+        <span class="identifier">boost</span><span class="special">::</span><span class="identifier">scope</span><span class="special">::</span><span class="identifier">scope_fail</span> <span class="identifier">cleanup</span><span class="special">{[</span><span class="keyword">this</span><span class="special">,</span> <span class="identifier">it</span><span class="special">]</span>
+        <span class="special">{</span>
+            <span class="identifier">objects</span><span class="special">.</span><span class="identifier">erase</span><span class="special">(</span><span class="identifier">it</span><span class="special">);</span>
+        <span class="special">}};</span>
+
+        <span class="comment">// Throws on error</span>
+        <span class="identifier">it</span><span class="special">-&gt;</span><span class="identifier">activate</span><span class="special">(</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">forward</span><span class="special">&lt;</span> <span class="identifier">T</span> <span class="special">&gt;(</span><span class="identifier">arg</span><span class="special">));</span>
+    <span class="special">}</span>
+<span class="special">};</span>
+</pre>
+            </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<br class="table-break"><p>
+      Unique resource wrapper provided by Boost.Scope is a generalization of smart
+      pointers like <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">unique_ptr</span></code> and <code class="computeroutput"><span class="identifier">boost</span><span class="special">::</span><span class="identifier">scoped_ptr</span></code>
+      from <a href="https://www.boost.org/doc/libs/release/libs/smart_ptr/doc/html/smart_ptr.html" target="_top">Boost.SmartPtr</a>.
+      While smart pointers are suitable for managing resources represented by pointers
+      (e.g. objects in dynamically allocated memory), unique resource wrapper can
+      be used with many more kinds of resource types, such as integers (e.g. POSIX
+      file descriptors) and user-defined types.
+    </p>
+<p>
+      The library defines its components in namespace <code class="computeroutput"><span class="identifier">boost</span><span class="special">::</span><span class="identifier">scope</span></code>.
+      For brevity, the namespace qualification may be omitted in this documentation;
+      readers should assume that unqualified names like <code class="computeroutput"><span class="identifier">scope_exit</span></code>
+      or <code class="computeroutput"><span class="identifier">unique_resource</span></code> are defined
+      in <code class="computeroutput"><span class="identifier">boost</span><span class="special">::</span><span class="identifier">scope</span></code>.
+    </p>
+</div>
+</div>
+<div class="copyright-footer"></div>
+<hr>
+<div class="spirit-nav"><a accesskey="n" href="scope/install_compat.html"><img src="../../../../doc/src/images/next.png" alt="Next"></a></div>
+</body>
+</html>
