@@ -21,21 +21,26 @@
 <a name="scope.scope_guards"></a><a class="link" href="scope_guards.html" title="Scope guards">Scope guards</a>
 </h2></div></div></div>
 <div class="toc"><dl class="toc">
-<dt><span class="section"><a href="scope_guards.html#scope.scope_guards.conditional"><code class="computeroutput"><span class="identifier">scope_exit</span></code>,
-      <code class="computeroutput"><span class="identifier">scope_success</span></code> and <code class="computeroutput"><span class="identifier">scope_fail</span></code></a></span></dt>
-<dt><span class="section"><a href="scope_guards.html#scope.scope_guards.unconditional"><code class="computeroutput"><span class="identifier">scope_final</span></code></a></span></dt>
+<dt><span class="section"><a href="scope_guards.html#scope.scope_guards.conditional">Conditional scope guards:
+      <code class="computeroutput"><span class="identifier">scope_exit</span></code>, <code class="computeroutput"><span class="identifier">scope_success</span></code>,
+      <code class="computeroutput"><span class="identifier">scope_fail</span></code> and <code class="computeroutput"><span class="identifier">scope_check</span></code></a></span></dt>
+<dt><span class="section"><a href="scope_guards.html#scope.scope_guards.custom_conditions">Customizing scope
+      guard conditions</a></span></dt>
+<dt><span class="section"><a href="scope_guards.html#scope.scope_guards.unconditional">Unconditional scope
+      guard: <code class="computeroutput"><span class="identifier">scope_final</span></code></a></span></dt>
 <dt><span class="section"><a href="scope_guards.html#scope.scope_guards.runtime_defined">Setting up scope
       exit actions at run time</a></span></dt>
 </dl></div>
 <p>
-      A scope guard is an object that invokes an arbitrary function object on destruction.
-      Scope guards are useful for implementing actions that need to be reliably performed
-      upon control leaving an execution scope, which is especially helpful for handling
-      exceptions.
+      A scope guard is an object that invokes an arbitrary <span class="emphasis"><em>action</em></span>
+      function object on destruction. Scope guards are useful for implementing actions
+      that need to be reliably performed upon control leaving an execution scope
+      (for example, when returning from a function), which is especially helpful
+      for handling exceptions.
     </p>
 <p>
-      The wrapped function object is specified on the scope guard construction and
-      cannot be changed afterwards. It must be one of:
+      The wrapped action function object is specified on the scope guard construction
+      and cannot be changed afterwards. It must be one of:
     </p>
 <div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; ">
 <li class="listitem">
@@ -54,14 +59,30 @@
       the entire lifetime of the scope guard.
     </p>
 <p>
-      Boost.Scope provides four kinds of scope guards, differing in their features
-      and conditions upon which the function object is called, summarised in the
-      table below.
+      Some scope guards also support specifying an additional <span class="emphasis"><em>condition</em></span>
+      function object, which allows for customizing the conditions in which the action
+      function object must be called. A condition function object must satisfy the
+      same requirements as the action function object listed above, plus the following:
+    </p>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; ">
+<li class="listitem">
+          invoking the condition function object must return a value contextually
+          convertible to <code class="computeroutput"><span class="keyword">bool</span></code>, and
+        </li>
+<li class="listitem">
+          invoking the condition function object must not throw exceptions.
+        </li>
+</ul></div>
+<p>
+      Boost.Scope provides five kinds of scope guards, differing in their features
+      and conditions upon which the action function object is called, summarised
+      in the table below.
     </p>
 <div class="table">
 <a name="scope.scope_guards.scope_guard_comparison"></a><p class="title"><b>Table 1.2. Scope guard comparison</b></p>
 <div class="table-contents"><table class="table" summary="Scope guard comparison">
 <colgroup>
+<col>
 <col>
 <col>
 <col>
@@ -91,6 +112,11 @@
             </th>
 <th>
               <p>
+                <code class="computeroutput"><a class="link" href="../boost/scope/scope_check.html" title="Class template scope_check">scope_check</a></code>
+              </p>
+            </th>
+<th>
+              <p>
                 <code class="computeroutput"><a class="link" href="../boost/scope/scope_final.html" title="Class template scope_final">scope_final</a></code>
               </p>
             </th>
@@ -99,7 +125,17 @@
 <tr>
 <td>
               <p>
-                Invokes function on normal scope exit?
+                Supports a condition function?
+              </p>
+            </td>
+<td>
+              <p>
+                No
+              </p>
+            </td>
+<td>
+              <p>
+                Yes
               </p>
             </td>
 <td>
@@ -115,6 +151,33 @@
 <td>
               <p>
                 No
+              </p>
+            </td>
+</tr>
+<tr>
+<td>
+              <p>
+                Invokes action on normal scope exit?
+              </p>
+            </td>
+<td>
+              <p>
+                Yes
+              </p>
+            </td>
+<td>
+              <p>
+                Yes
+              </p>
+            </td>
+<td>
+              <p>
+                No
+              </p>
+            </td>
+<td>
+              <p>
+                Depends on condition
               </p>
             </td>
 <td>
@@ -126,7 +189,7 @@
 <tr>
 <td>
               <p>
-                Invokes function on scope exit due to an exception?
+                Invokes action on scope exit due to failure?
               </p>
             </td>
 <td>
@@ -142,6 +205,11 @@
 <td>
               <p>
                 Yes
+              </p>
+            </td>
+<td>
+              <p>
+                Depends on condition
               </p>
             </td>
 <td>
@@ -153,7 +221,7 @@
 <tr>
 <td>
               <p>
-                Function may throw?
+                Action may throw?
               </p>
             </td>
 <td>
@@ -163,12 +231,17 @@
             </td>
 <td>
               <p>
-                Yes
+                Typically yes
               </p>
             </td>
 <td>
               <p>
-                No
+                Typically no
+              </p>
+            </td>
+<td>
+              <p>
+                Depends on condition
               </p>
             </td>
 <td>
@@ -200,6 +273,11 @@
             </td>
 <td>
               <p>
+                Yes
+              </p>
+            </td>
+<td>
+              <p>
                 No
               </p>
             </td>
@@ -207,7 +285,12 @@
 <tr>
 <td>
               <p>
-                Move-constructible? (requires function to be move-constructible)
+                Move-constructible? (requires function objects to be move-constructible)
+              </p>
+            </td>
+<td>
+              <p>
+                Yes
               </p>
             </td>
 <td>
@@ -254,6 +337,11 @@
             </td>
 <td>
               <p>
+                Yes
+              </p>
+            </td>
+<td>
+              <p>
                 No
               </p>
             </td>
@@ -261,49 +349,74 @@
 </tbody>
 </table></div>
 </div>
-<br class="table-break"><div class="note"><table border="0" summary="Note">
-<tr>
-<td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="../../../../../doc/src/images/note.png"></td>
-<th align="left">Note</th>
-</tr>
-<tr><td align="left" valign="top"><p>
-        Except for <code class="computeroutput"><a class="link" href="../boost/scope/scope_fail.html" title="Class template scope_fail">scope_fail</a></code>,
-        function objects wrapped in scope guards are allowed to throw exceptions
-        upon execution. However, users should remember that <code class="computeroutput"><a class="link" href="../boost/scope/scope_exit.html" title="Class template scope_exit">scope_exit</a></code>
-        and <code class="computeroutput"><a class="link" href="../boost/scope/scope_final.html" title="Class template scope_final">scope_final</a></code> invoke
-        the wrapped function upon exceptions, and throwing an exception from the
-        scope guard in this case will terminate the program. It is user's responsibility
-        to ensure this doesn't happen. This problem doesn't exist for <code class="computeroutput"><a class="link" href="../boost/scope/scope_success.html" title="Class template scope_success">scope_success</a></code> because it doesn't
-        invoke the wrapped function object on exceptions. However, it is generally
-        recommended to use scope guards to implement actions that cannot throw and
-        move all operations that may fail to the normal code flow.
-      </p></td></tr>
-</table></div>
+<br class="table-break"><p>
+      In the table above, the term "failure" is used broadly. What constitutes
+      a failure in a given context is specified by user in the form of the condition
+      function object. Most often, a thrown exception is taken as an indication of
+      a failure, but it can be changed to, for example, a check for an error code
+      that is being returned from the enclosing function.
+    </p>
+<p>
+      Although it is possible to specify arbitrary condition function objects, typically
+      <code class="computeroutput"><a class="link" href="../boost/scope/scope_success.html" title="Class template scope_success">scope_success</a></code> invokes
+      its action when the scope is left normally (i.e. not via an exception) and
+      <code class="computeroutput"><a class="link" href="../boost/scope/scope_fail.html" title="Class template scope_fail">scope_fail</a></code> should typically
+      be used to handle errors, including exceptions. For this reason, action functions
+      that are used with <code class="computeroutput"><a class="link" href="../boost/scope/scope_fail.html" title="Class template scope_fail">scope_fail</a></code>
+      are typically not allowed to throw, as this may cause the program to terminate.
+      This is also a concern with other scope guards, such as <code class="computeroutput"><a class="link" href="../boost/scope/scope_exit.html" title="Class template scope_exit">scope_exit</a></code>
+      and <code class="computeroutput"><a class="link" href="../boost/scope/scope_final.html" title="Class template scope_final">scope_final</a></code>, which
+      also may invoke their actions due to an exception. It is user's responsibility
+      to ensure that scope guard actions don't throw if another exception is being
+      propagated. Generally, it is recommended to use scope guards to implement actions
+      that cannot throw and move all operations that may fail to the normal code
+      flow.
+    </p>
 <div class="section">
 <div class="titlepage"><div><div><h3 class="title">
-<a name="scope.scope_guards.conditional"></a><a class="link" href="scope_guards.html#scope.scope_guards.conditional" title="scope_exit, scope_success and scope_fail"><code class="computeroutput"><span class="identifier">scope_exit</span></code>,
-      <code class="computeroutput"><span class="identifier">scope_success</span></code> and <code class="computeroutput"><span class="identifier">scope_fail</span></code></a>
+<a name="scope.scope_guards.conditional"></a><a class="link" href="scope_guards.html#scope.scope_guards.conditional" title="Conditional scope guards: scope_exit, scope_success, scope_fail and scope_check">Conditional scope guards:
+      <code class="computeroutput"><span class="identifier">scope_exit</span></code>, <code class="computeroutput"><span class="identifier">scope_success</span></code>,
+      <code class="computeroutput"><span class="identifier">scope_fail</span></code> and <code class="computeroutput"><span class="identifier">scope_check</span></code></a>
 </h3></div></div></div>
 <pre class="programlisting"><span class="preprocessor">#include</span> <span class="special">&lt;</span><code class="computeroutput"><a class="link" href="../reference.html#header.boost.scope.scope_exit_hpp" title="Header &lt;boost/scope/scope_exit.hpp&gt;">boost/scope/scope_exit.hpp</a></code><span class="special">&gt;</span>
 <span class="preprocessor">#include</span> <span class="special">&lt;</span><code class="computeroutput"><a class="link" href="../reference.html#header.boost.scope.scope_success_hpp" title="Header &lt;boost/scope/scope_success.hpp&gt;">boost/scope/scope_success.hpp</a></code><span class="special">&gt;</span>
 <span class="preprocessor">#include</span> <span class="special">&lt;</span><code class="computeroutput"><a class="link" href="../reference.html#header.boost.scope.scope_fail_hpp" title="Header &lt;boost/scope/scope_fail.hpp&gt;">boost/scope/scope_fail.hpp</a></code><span class="special">&gt;</span>
+<span class="preprocessor">#include</span> <span class="special">&lt;</span><code class="computeroutput"><a class="link" href="../reference.html#header.boost.scope.scope_check_hpp" title="Header &lt;boost/scope/scope_check.hpp&gt;">boost/scope/scope_check.hpp</a></code><span class="special">&gt;</span>
 </pre>
 <p>
-        The <code class="computeroutput"><a class="link" href="../boost/scope/scope_exit.html" title="Class template scope_exit">scope_exit</a></code>, <code class="computeroutput"><a class="link" href="../boost/scope/scope_success.html" title="Class template scope_success">scope_success</a></code> and <code class="computeroutput"><a class="link" href="../boost/scope/scope_fail.html" title="Class template scope_fail">scope_fail</a></code> scope guards provide
-        similar interfaces and capabilities and only differ in conditions when they
-        invoke the wrapped function object. As shown in the table above, <code class="computeroutput"><a class="link" href="../boost/scope/scope_success.html" title="Class template scope_success">scope_success</a></code> only invokes
-        the function object if it is destroyed normally, <code class="computeroutput"><a class="link" href="../boost/scope/scope_fail.html" title="Class template scope_fail">scope_fail</a></code>
-        - if it is destroyed due to an exception being thrown, and <code class="computeroutput"><a class="link" href="../boost/scope/scope_exit.html" title="Class template scope_exit">scope_exit</a></code>
-        acts regardless of the exception status.
+        The <code class="computeroutput"><a class="link" href="../boost/scope/scope_exit.html" title="Class template scope_exit">scope_exit</a></code>, <code class="computeroutput"><a class="link" href="../boost/scope/scope_success.html" title="Class template scope_success">scope_success</a></code>, <code class="computeroutput"><a class="link" href="../boost/scope/scope_fail.html" title="Class template scope_fail">scope_fail</a></code>
+        and <code class="computeroutput"><a class="link" href="../boost/scope/scope_check.html" title="Class template scope_check">scope_check</a></code> scope
+        guards have a lot of similarities in interfaces and capabilities and differ
+        in conditions when they invoke the action function object. As shown in the
+        table above, <code class="computeroutput"><a class="link" href="../boost/scope/scope_success.html" title="Class template scope_success">scope_success</a></code>,
+        <code class="computeroutput"><a class="link" href="../boost/scope/scope_fail.html" title="Class template scope_fail">scope_fail</a></code> and <code class="computeroutput"><a class="link" href="../boost/scope/scope_check.html" title="Class template scope_check">scope_check</a></code> support specifying
+        an additional condition function object, while <code class="computeroutput"><a class="link" href="../boost/scope/scope_exit.html" title="Class template scope_exit">scope_exit</a></code>
+        does not. By default, <code class="computeroutput"><a class="link" href="../boost/scope/scope_success.html" title="Class template scope_success">scope_success</a></code>
+        will invoke its action if it is destroyed normally, <code class="computeroutput"><a class="link" href="../boost/scope/scope_fail.html" title="Class template scope_fail">scope_fail</a></code>
+        - if it is destroyed due to an exception being thrown. <code class="computeroutput"><a class="link" href="../boost/scope/scope_check.html" title="Class template scope_check">scope_check</a></code>
+        does not have a default condition and invokes its action if the user-specified
+        condition is satisfied.
       </p>
+<div class="tip"><table border="0" summary="Tip">
+<tr>
+<td rowspan="2" align="center" valign="top" width="25"><img alt="[Tip]" src="../../../../../doc/src/images/tip.png"></td>
+<th align="left">Tip</th>
+</tr>
+<tr><td align="left" valign="top"><p>
+          Customizing condition function objects will be discussed in more detail
+          in the <a class="link" href="scope_guards.html#scope.scope_guards.custom_conditions" title="Customizing scope guard conditions">next</a>
+          section.
+        </p></td></tr>
+</table></div>
 <p>
-        In addition to the exception status, each of the scope guards supports active
-        and inactive state. The wrapped function object will only be called if the
-        scope guard is in active state while being destroyed. By default, scope guards
-        are created in active state, but this can be changed by passing <code class="computeroutput"><span class="keyword">false</span></code> as the second argument for the constructor.
-        Scope guards can also be deactivated or re-activated during their lifetime,
-        which can be useful if the scope guard needs to be activated based on some
-        condition.
+        Aside from condition function objects, each of the scope guards supports
+        active and inactive state. The action function object will only be called
+        if the scope guard is in active state while being destroyed. By default,
+        scope guards are created in active state, but this can be changed by passing
+        <code class="computeroutput"><span class="keyword">false</span></code> as the last argument for
+        the constructor. Scope guards can also be deactivated or re-activated during
+        their lifetime, which can be useful if the scope guard needs to be activated
+        based on some run time condition after it is created.
       </p>
 <pre class="programlisting"><span class="keyword">class</span> <span class="identifier">collection</span>
 <span class="special">{</span>
@@ -346,7 +459,7 @@
 <span class="keyword">false</span><span class="special">);</span>
 </pre>
 <p>
-        Factory functions are provided for each of the three scope guards described
+        Factory functions are provided for each of the four scope guards described
         in this section and are compatible with C++11.
       </p>
 <p>
@@ -358,14 +471,203 @@
 </div>
 <div class="section">
 <div class="titlepage"><div><div><h3 class="title">
-<a name="scope.scope_guards.unconditional"></a><a class="link" href="scope_guards.html#scope.scope_guards.unconditional" title="scope_final"><code class="computeroutput"><span class="identifier">scope_final</span></code></a>
+<a name="scope.scope_guards.custom_conditions"></a><a class="link" href="scope_guards.html#scope.scope_guards.custom_conditions" title="Customizing scope guard conditions">Customizing scope
+      guard conditions</a>
+</h3></div></div></div>
+<pre class="programlisting"><span class="preprocessor">#include</span> <span class="special">&lt;</span><code class="computeroutput"><a class="link" href="../reference.html#header.boost.scope.exception_checker_hpp" title="Header &lt;boost/scope/exception_checker.hpp&gt;">boost/scope/exception_checker.hpp</a></code><span class="special">&gt;</span>
+<span class="preprocessor">#include</span> <span class="special">&lt;</span><code class="computeroutput"><a class="link" href="../reference.html#header.boost.scope.error_code_checker_hpp" title="Header &lt;boost/scope/error_code_checker.hpp&gt;">boost/scope/error_code_checker.hpp</a></code><span class="special">&gt;</span>
+</pre>
+<p>
+        As discussed before, <code class="computeroutput"><a class="link" href="../boost/scope/scope_success.html" title="Class template scope_success">scope_success</a></code>,
+        <code class="computeroutput"><a class="link" href="../boost/scope/scope_fail.html" title="Class template scope_fail">scope_fail</a></code> and <code class="computeroutput"><a class="link" href="../boost/scope/scope_check.html" title="Class template scope_check">scope_check</a></code> support specifying
+        an additional condition function object that will be called to decide whether
+        the scope guard should invoke the action. By default, <code class="computeroutput"><a class="link" href="../boost/scope/scope_success.html" title="Class template scope_success">scope_success</a></code>
+        and <code class="computeroutput"><a class="link" href="../boost/scope/scope_fail.html" title="Class template scope_fail">scope_fail</a></code> use
+        the <code class="computeroutput"><a class="link" href="../boost/scope/exception_checker.html" title="Class exception_checker">exception_checker</a></code>
+        condition function, which tests if an exception is being thrown at the point
+        of its call, compared to the point of its construction. Note that the condition
+        function returns <code class="computeroutput"><span class="keyword">true</span></code> when the
+        exception is detected. <code class="computeroutput"><a class="link" href="../boost/scope/scope_success.html" title="Class template scope_success">scope_success</a></code>
+        invokes its action when the condition returns <code class="computeroutput"><span class="keyword">false</span></code>
+        (i.e. when the failure is not detected) and <code class="computeroutput"><a class="link" href="../boost/scope/scope_fail.html" title="Class template scope_fail">scope_fail</a></code>
+        - when the condition returns <code class="computeroutput"><span class="keyword">true</span></code>
+        (i.e. when the failure is detected).
+      </p>
+<p>
+        For <code class="computeroutput"><a class="link" href="../boost/scope/scope_check.html" title="Class template scope_check">scope_check</a></code>, there
+        is no default condition, and the condition function object must be specified
+        by user on construction. <code class="computeroutput"><a class="link" href="../boost/scope/scope_check.html" title="Class template scope_check">scope_check</a></code>
+        will only invoke its action if the condition function returns <code class="computeroutput"><span class="keyword">true</span></code>.
+      </p>
+<div class="tip"><table border="0" summary="Tip">
+<tr>
+<td rowspan="2" align="center" valign="top" width="25"><img alt="[Tip]" src="../../../../../doc/src/images/tip.png"></td>
+<th align="left">Tip</th>
+</tr>
+<tr><td align="left" valign="top"><p>
+          You may notice that <code class="computeroutput"><a class="link" href="../boost/scope/scope_check.html" title="Class template scope_check">scope_check</a></code>
+          behavior is similar to <code class="computeroutput"><a class="link" href="../boost/scope/scope_fail.html" title="Class template scope_fail">scope_fail</a></code>
+          and opposite to <code class="computeroutput"><a class="link" href="../boost/scope/scope_success.html" title="Class template scope_success">scope_success</a></code>.
+          The main difference is a semantic one: <code class="computeroutput"><a class="link" href="../boost/scope/scope_check.html" title="Class template scope_check">scope_check</a></code>
+          does not have the default condition and doesn't immediately correspond
+          to a success or failure handler. On the other hand, <code class="computeroutput"><a class="link" href="../boost/scope/scope_success.html" title="Class template scope_success">scope_success</a></code>
+          and <code class="computeroutput"><a class="link" href="../boost/scope/scope_fail.html" title="Class template scope_fail">scope_fail</a></code> correspond
+          to their respective use cases, and the default condition function makes
+          them equivalent to the scope guards defined in <a href="https://cplusplus.github.io/fundamentals-ts/v3.html#scope.syn" target="_top"><code class="computeroutput"><span class="special">&lt;</span><span class="identifier">experimental</span><span class="special">/</span><span class="identifier">scope</span><span class="special">&gt;</span></code></a>.
+        </p></td></tr>
+</table></div>
+<p>
+        All three scope guards accept the condition function object as the second
+        argument for the constructor or factory function, after the action function
+        object. The condition function object must be callable with no arguments,
+        and must not throw exceptions when being called.
+      </p>
+<pre class="programlisting"><span class="comment">// Writes a string to a file using a file descriptor, with file locking.</span>
+<span class="comment">// Reports errors either via an error_code parameter.</span>
+<span class="keyword">void</span> <span class="identifier">locked_write_string</span><span class="special">(</span><span class="keyword">int</span> <span class="identifier">fd</span><span class="special">,</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">string</span> <span class="keyword">const</span><span class="special">&amp;</span> <span class="identifier">str</span><span class="special">,</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">error_code</span><span class="special">&amp;</span> <span class="identifier">ec</span><span class="special">)</span>
+<span class="special">{</span>
+    <span class="keyword">int</span> <span class="identifier">err</span> <span class="special">=</span> <span class="number">0</span><span class="special">;</span>
+
+    <span class="comment">// Automatically transform errors to error_code on exit</span>
+    <span class="identifier">boost</span><span class="special">::</span><span class="identifier">scope</span><span class="special">::</span><span class="identifier">scope_fail</span> <span class="identifier">fail_guard</span>
+    <span class="special">{</span>
+        <span class="comment">// Action function object</span>
+        <span class="special">[&amp;]</span> <span class="special">{</span> <span class="identifier">ec</span> <span class="special">=</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">error_code</span><span class="special">(</span><span class="identifier">err</span><span class="special">,</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">generic_category</span><span class="special">());</span> <span class="special">},</span>
+        <span class="comment">// Condition function object</span>
+        <span class="special">[&amp;</span><span class="identifier">err</span><span class="special">]()</span> <span class="keyword">noexcept</span> <span class="special">{</span> <span class="keyword">return</span> <span class="identifier">err</span> <span class="special">!=</span> <span class="number">0</span> <span class="special">&amp;&amp;</span> <span class="identifier">err</span> <span class="special">!=</span> <span class="identifier">EINTR</span><span class="special">;</span> <span class="special">}</span>
+    <span class="special">};</span>
+
+    <span class="comment">// Lock the file</span>
+    <span class="keyword">while</span> <span class="special">(</span><span class="identifier">flock</span><span class="special">(</span><span class="identifier">fd</span><span class="special">,</span> <span class="identifier">LOCK_EX</span><span class="special">)</span> <span class="special">&lt;</span> <span class="number">0</span><span class="special">)</span>
+    <span class="special">{</span>
+        <span class="identifier">err</span> <span class="special">=</span> <span class="identifier">errno</span><span class="special">;</span>
+        <span class="keyword">if</span> <span class="special">(</span><span class="identifier">err</span> <span class="special">!=</span> <span class="identifier">EINTR</span><span class="special">)</span>
+            <span class="keyword">return</span><span class="special">;</span>
+    <span class="special">}</span>
+
+    <span class="comment">// Unlock the file on exit</span>
+    <span class="identifier">BOOST_SCOPE_FINAL</span> <span class="special">[&amp;]</span>
+    <span class="special">{</span>
+        <span class="keyword">while</span> <span class="special">(</span><span class="identifier">flock</span><span class="special">(</span><span class="identifier">fd</span><span class="special">,</span> <span class="identifier">LOCK_UN</span><span class="special">)</span> <span class="special">&lt;</span> <span class="number">0</span><span class="special">)</span>
+        <span class="special">{</span>
+            <span class="identifier">err</span> <span class="special">=</span> <span class="identifier">errno</span><span class="special">;</span>
+            <span class="keyword">if</span> <span class="special">(</span><span class="identifier">err</span> <span class="special">!=</span> <span class="identifier">EINTR</span><span class="special">)</span>
+                <span class="keyword">return</span><span class="special">;</span>
+        <span class="special">}</span>
+    <span class="special">};</span>
+
+    <span class="comment">// Write data</span>
+    <span class="keyword">const</span> <span class="keyword">char</span><span class="special">*</span> <span class="identifier">p</span> <span class="special">=</span> <span class="identifier">str</span><span class="special">.</span><span class="identifier">data</span><span class="special">();</span>
+    <span class="identifier">std</span><span class="special">::</span><span class="identifier">size_t</span> <span class="identifier">size_left</span> <span class="special">=</span> <span class="identifier">str</span><span class="special">.</span><span class="identifier">size</span><span class="special">();</span>
+    <span class="keyword">while</span> <span class="special">(</span><span class="identifier">size_left</span> <span class="special">&gt;</span> <span class="number">0</span><span class="special">)</span>
+    <span class="special">{</span>
+        <span class="identifier">ssize_t</span> <span class="identifier">written</span> <span class="special">=</span> <span class="identifier">write</span><span class="special">(</span><span class="identifier">fd</span><span class="special">,</span> <span class="identifier">p</span><span class="special">,</span> <span class="identifier">size_left</span><span class="special">);</span>
+        <span class="keyword">if</span> <span class="special">(</span><span class="identifier">written</span> <span class="special">&lt;</span> <span class="number">0</span><span class="special">)</span>
+        <span class="special">{</span>
+            <span class="identifier">err</span> <span class="special">=</span> <span class="identifier">errno</span><span class="special">;</span>
+            <span class="keyword">if</span> <span class="special">(</span><span class="identifier">err</span> <span class="special">==</span> <span class="identifier">EINTR</span><span class="special">)</span>
+                <span class="keyword">continue</span><span class="special">;</span>
+            <span class="keyword">return</span><span class="special">;</span>
+        <span class="special">}</span>
+
+        <span class="identifier">p</span> <span class="special">+=</span> <span class="identifier">written</span><span class="special">;</span>
+        <span class="identifier">size_left</span> <span class="special">-=</span> <span class="identifier">written</span><span class="special">;</span>
+    <span class="special">}</span>
+<span class="special">}</span>
+</pre>
+<p>
+        Besides <code class="computeroutput"><a class="link" href="../boost/scope/exception_checker.html" title="Class exception_checker">exception_checker</a></code>,
+        the library also provides <code class="computeroutput"><a class="link" href="../boost/scope/error_code_checker.html" title="Class template error_code_checker">error_code_checker</a></code>
+        that can be used as a condition function object. On construction, <code class="computeroutput"><a class="link" href="../boost/scope/error_code_checker.html" title="Class template error_code_checker">error_code_checker</a></code> captures
+        a reference to an external error code object and checks it for an error indication
+        when being called. An object <code class="computeroutput"><span class="identifier">ec</span></code>
+        can be used as an error code object if:
+      </p>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; ">
+<li class="listitem">
+            the expression <code class="computeroutput"><span class="special">!</span><span class="identifier">ec</span></code>
+            is valid, never throws, and returns a value contextually convertible
+            to <code class="computeroutput"><span class="keyword">bool</span></code>, and
+          </li>
+<li class="listitem">
+            the expression <code class="computeroutput"><span class="special">!</span><span class="identifier">ec</span></code>
+            produces a value contextually convertible to <code class="computeroutput"><span class="keyword">true</span></code>
+            when there is no error and <code class="computeroutput"><span class="keyword">false</span></code>
+            otherwise.
+          </li>
+</ul></div>
+<p>
+        That is, for an error code object <code class="computeroutput"><span class="identifier">ec</span></code>,
+        invoking <code class="computeroutput"><a class="link" href="../boost/scope/error_code_checker.html" title="Class template error_code_checker">error_code_checker</a></code>
+        results in a value equivalent to <code class="computeroutput"><span class="special">!!</span><span class="identifier">ec</span></code>. This makes <code class="computeroutput"><a class="link" href="../boost/scope/error_code_checker.html" title="Class template error_code_checker">error_code_checker</a></code>
+        compatible with a wide variety of error code types, including:
+      </p>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; ">
+<li class="listitem">
+            <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">error_code</span></code> or <code class="computeroutput"><span class="identifier">boost</span><span class="special">::</span><span class="identifier">system</span><span class="special">::</span><span class="identifier">error_code</span></code>
+            from <a href="https://www.boost.org/doc/libs/release/libs/system/doc/html/system.html" target="_top">Boost.System</a>,
+          </li>
+<li class="listitem">
+            <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">expected</span></code>, <code class="computeroutput"><span class="identifier">boost</span><span class="special">::</span><span class="identifier">outcome_v2</span><span class="special">::</span><span class="identifier">basic_outcome</span></code>
+            or <code class="computeroutput"><span class="identifier">boost</span><span class="special">::</span><span class="identifier">outcome_v2</span><span class="special">::</span><span class="identifier">basic_result</span></code> from <a href="https://www.boost.org/doc/libs/release/libs/outcome/doc/html/index.html" target="_top">Boost.Outcome</a>,
+          </li>
+<li class="listitem">
+            <code class="computeroutput"><span class="keyword">int</span></code>, where the value of
+            0 indicates no error,
+          </li>
+<li class="listitem">
+            <code class="computeroutput"><span class="keyword">bool</span></code>, where the value of
+            <code class="computeroutput"><span class="keyword">false</span></code> indicates no error,
+          </li>
+<li class="listitem">
+            <code class="computeroutput"><span class="identifier">T</span><span class="special">*</span></code>,
+            where a null pointer indicates no error.
+          </li>
+</ul></div>
+<p>
+        For C++11 compilers, the library also provides a factory function <code class="computeroutput"><span class="identifier">check_error_code</span></code>. For example, our previous
+        example could use this condition function object like this:
+      </p>
+<pre class="programlisting"><span class="comment">// Writes a string to a file using a file descriptor, with file locking.</span>
+<span class="comment">// Reports errors either via an error_code parameter.</span>
+<span class="keyword">void</span> <span class="identifier">locked_write_string</span><span class="special">(</span><span class="keyword">int</span> <span class="identifier">fd</span><span class="special">,</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">string</span> <span class="keyword">const</span><span class="special">&amp;</span> <span class="identifier">str</span><span class="special">,</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">error_code</span><span class="special">&amp;</span> <span class="identifier">ec</span><span class="special">)</span>
+<span class="special">{</span>
+    <span class="keyword">int</span> <span class="identifier">err</span> <span class="special">=</span> <span class="number">0</span><span class="special">;</span>
+
+    <span class="comment">// Automatically transform errors to error_code on exit</span>
+    <span class="identifier">boost</span><span class="special">::</span><span class="identifier">scope</span><span class="special">::</span><span class="identifier">scope_fail</span> <span class="identifier">fail_guard</span>
+    <span class="special">{</span>
+        <span class="comment">// Action function object</span>
+        <span class="special">[&amp;]</span>
+        <span class="special">{</span>
+            <span class="keyword">if</span> <span class="special">(</span><span class="identifier">err</span> <span class="special">!=</span> <span class="identifier">EINTR</span><span class="special">)</span>
+                <span class="identifier">ec</span> <span class="special">=</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">error_code</span><span class="special">(</span><span class="identifier">err</span><span class="special">,</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">generic_category</span><span class="special">());</span>
+        <span class="special">},</span>
+        <span class="comment">// Condition function object</span>
+        <span class="identifier">boost</span><span class="special">::</span><span class="identifier">scope</span><span class="special">::</span><span class="identifier">check_error_code</span><span class="special">(</span><span class="identifier">err</span><span class="special">)</span>
+    <span class="special">};</span>
+
+    <span class="comment">// ...</span>
+<span class="special">}</span>
+</pre>
+<p>
+        Note that we had to move the test for <code class="computeroutput"><span class="identifier">EINTR</span></code>
+        to the scope guard action since <code class="computeroutput"><a class="link" href="../boost/scope/error_code_checker.html" title="Class template error_code_checker">error_code_checker</a></code>
+        would only test <code class="computeroutput"><span class="identifier">err</span></code> for being
+        zero.
+      </p>
+</div>
+<div class="section">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="scope.scope_guards.unconditional"></a><a class="link" href="scope_guards.html#scope.scope_guards.unconditional" title="Unconditional scope guard: scope_final">Unconditional scope
+      guard: <code class="computeroutput"><span class="identifier">scope_final</span></code></a>
 </h3></div></div></div>
 <pre class="programlisting"><span class="preprocessor">#include</span> <span class="special">&lt;</span><code class="computeroutput"><a class="link" href="../reference.html#header.boost.scope.scope_final_hpp" title="Header &lt;boost/scope/scope_final.hpp&gt;">boost/scope/scope_final.hpp</a></code><span class="special">&gt;</span>
 </pre>
 <p>
         The <code class="computeroutput"><a class="link" href="../boost/scope/scope_final.html" title="Class template scope_final">scope_final</a></code> scope
         guard is similar to <code class="computeroutput"><a class="link" href="../boost/scope/scope_exit.html" title="Class template scope_exit">scope_exit</a></code>
-        in terms of when it invokes the wrapped function. But it lacks support for
+        in terms of when it invokes the action function. But it lacks support for
         moveability and activation/deactivation - this scope guard is always active
         upon construction. This allows to implement it more efficiently when these
         features are not needed.
@@ -416,7 +718,8 @@
 <div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; ">
 <li class="listitem">
             The declaration does not name a scope guard variable, meaning one does
-            not need to invent one.
+            not need to invent one and there is no possibility to accidentally omit
+            one.
           </li>
 <li class="listitem">
             The declaration is generally shorter to type and easier to spot.
@@ -517,6 +820,26 @@
     <span class="identifier">cleanup_true</span><span class="special">.</span><span class="identifier">set_active</span><span class="special">(</span><span class="keyword">true</span><span class="special">);</span>
 <span class="keyword">else</span>
     <span class="identifier">cleanup_false</span><span class="special">.</span><span class="identifier">set_active</span><span class="special">(</span><span class="keyword">true</span><span class="special">);</span>
+</pre>
+<p>
+        Alternatively, one could implement the selection within the scope guard action
+        itself.
+      </p>
+<pre class="programlisting"><span class="comment">// Create a single inactive scope guard that implements both branches</span>
+<span class="keyword">bool</span> <span class="identifier">cond</span><span class="special">;</span>
+<span class="identifier">boost</span><span class="special">::</span><span class="identifier">scope</span><span class="special">::</span><span class="identifier">scope_exit</span> <span class="identifier">cleanup</span><span class="special">([&amp;</span><span class="identifier">cond</span><span class="special">]</span>
+<span class="special">{</span>
+    <span class="keyword">if</span> <span class="special">(</span><span class="identifier">cond</span><span class="special">)</span>
+        <span class="identifier">std</span><span class="special">::</span><span class="identifier">cout</span> <span class="special">&lt;&lt;</span> <span class="string">"cond is true"</span> <span class="special">&lt;&lt;</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">endl</span><span class="special">;</span>
+    <span class="keyword">else</span>
+        <span class="identifier">std</span><span class="special">::</span><span class="identifier">cout</span> <span class="special">&lt;&lt;</span> <span class="string">"cond is false"</span> <span class="special">&lt;&lt;</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">endl</span><span class="special">;</span>
+<span class="special">},</span>
+<span class="keyword">false</span><span class="special">);</span>
+
+<span class="comment">// Later in the program, select the branch to perform</span>
+<span class="comment">// and activate the scope guard.</span>
+<span class="identifier">cond</span> <span class="special">=</span> <span class="identifier">select_branch</span><span class="special">();</span>
+<span class="identifier">cleanup</span><span class="special">.</span><span class="identifier">set_active</span><span class="special">(</span><span class="keyword">true</span><span class="special">);</span>
 </pre>
 </div>
 </div>

@@ -26,11 +26,12 @@
 <div class="refsynopsisdiv"><pre class="synopsis"><span class="comment">// In header: &lt;<a class="link" href="../../reference.html#header.boost.scope.scope_exit_hpp" title="Header &lt;boost/scope/scope_exit.hpp&gt;">boost/scope/scope_exit.hpp</a>&gt;
 
 </span>
-<span class="keyword">template</span><span class="special">&lt;</span><span class="keyword">typename</span> Func<span class="special">&gt;</span> 
-  <a class="link" href="scope_exit.html" title="Class template scope_exit">scope_exit</a><span class="special">&lt;</span> <span class="identifier">Func</span> <span class="special">&gt;</span> <span class="identifier">make_scope_exit</span><span class="special">(</span><span class="identifier">Func</span> <span class="special">&amp;&amp;</span> func<span class="special">,</span> <span class="keyword">bool</span> active <span class="special">=</span> <span class="keyword">true</span><span class="special">)</span><span class="special">;</span></pre></div>
+<span class="keyword">template</span><span class="special">&lt;</span><span class="keyword">typename</span> F<span class="special">&gt;</span> 
+  <a class="link" href="scope_exit.html" title="Class template scope_exit">scope_exit</a><span class="special">&lt;</span> <span class="keyword">typename</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">remove_cv</span><span class="special">&lt;</span> <span class="keyword">typename</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">remove_reference</span><span class="special">&lt;</span> <span class="identifier">F</span> <span class="special">&gt;</span><span class="special">::</span><span class="identifier">type</span> <span class="special">&gt;</span><span class="special">::</span><span class="identifier">type</span> <span class="special">&gt;</span> 
+  <span class="identifier">make_scope_exit</span><span class="special">(</span><span class="identifier">F</span> <span class="special">&amp;&amp;</span> func<span class="special">,</span> <span class="keyword">bool</span> active <span class="special">=</span> <span class="keyword">true</span><span class="special">)</span><span class="special">;</span></pre></div>
 <div class="refsect1">
-<a name="idm2295"></a><h2>Description</h2>
-<p><span class="bold"><strong>Effects:</strong></span> Constructs a scope guard as if by calling <code class="computeroutput"><code class="computeroutput"><a class="link" href="scope_exit.html" title="Class template scope_exit">scope_exit</a></code>&lt; Func &gt;(std::forward&lt; Func &gt;(func), active)</code>.</p>
+<a name="idm3872"></a><h2>Description</h2>
+<p><span class="bold"><strong>Effects:</strong></span> Constructs a scope guard as if by calling <code class="computeroutput"><code class="computeroutput"><a class="link" href="scope_exit.html" title="Class template scope_exit">scope_exit</a></code>&lt; std::remove_cvref_t&lt; F &gt; &gt;(std::forward&lt; F &gt;(func), active)</code>.</p>
 <p>
 </p>
 <div class="variablelist"><table border="0" class="variablelist compact">
