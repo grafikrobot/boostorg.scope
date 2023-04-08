@@ -32,29 +32,38 @@
   <span class="keyword">typedef</span> <span class="keyword">bool</span> <a name="boost.scope.exception_checker.result_type"></a><span class="identifier">result_type</span><span class="special">;</span>  <span class="comment">// Predicate result type. </span>
 
   <span class="comment">// <a class="link" href="exception_checker.html#boost.scope.exception_checkerconstruct-copy-destruct">construct/copy/destruct</a></span>
-  <a class="link" href="exception_checker.html#idm2263-bb"><span class="identifier">exception_checker</span></a><span class="special">(</span><span class="special">)</span> <span class="keyword">noexcept</span><span class="special">;</span>
+  <a class="link" href="exception_checker.html#idm2325-bb"><span class="identifier">exception_checker</span></a><span class="special">(</span><span class="special">)</span> <span class="keyword">noexcept</span><span class="special">;</span>
 
-  <span class="comment">// <a class="link" href="exception_checker.html#idm2251-bb">public member functions</a></span>
-  <span class="identifier">result_type</span> <a class="link" href="exception_checker.html#idm2252-bb"><span class="keyword">operator</span><span class="special">(</span><span class="special">)</span></a><span class="special">(</span><span class="special">)</span> <span class="keyword">const</span> <span class="keyword">noexcept</span><span class="special">;</span>
+  <span class="comment">// <a class="link" href="exception_checker.html#idm2313-bb">public member functions</a></span>
+  <span class="identifier">result_type</span> <a class="link" href="exception_checker.html#idm2314-bb"><span class="keyword">operator</span><span class="special">(</span><span class="special">)</span></a><span class="special">(</span><span class="special">)</span> <span class="keyword">const</span> <span class="keyword">noexcept</span><span class="special">;</span>
 <span class="special">}</span><span class="special">;</span></pre></div>
 <div class="refsect1">
-<a name="idm2520"></a><h2>Description</h2>
-<p>On construction, the predicate captures the current number of uncaught exceptions, which it then uses when called to detect if a new exception is being thrown. </p>
+<a name="idm2592"></a><h2>Description</h2>
+<p>On construction, the predicate captures the current number of uncaught exceptions, which it then compares with the number of uncaught exceptions at the point when it is called. If the number increased then a new exception is detected and the predicate returns <code class="computeroutput">true</code>.</p>
+<div class="note"><table border="0" summary="Note">
+<tr>
+<td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="../../../../../../doc/src/images/note.png"></td>
+<th align="left">Note</th>
+</tr>
+<tr><td align="left" valign="top"><p>This predicate is designed for a specific use case with scope guards created on the stack. It is incompatible with C++20 coroutines and similar facilities (e.g. fibers and userspace context switching), where the thread of execution may be suspended after the predicate captures the number of uncaught exceptions and then resumed in a different context, where the number of uncaught exceptions has changed. Similarly, it is incompatible with usage patterns where the predicate is cached after construction and is invoked after the thread has left the scope where the predicate was constructed (e.g. when the predicate is stored as a class data member or a namespace-scope variable). </p></td></tr>
+</table></div>
+<p>
+</p>
 <div class="refsect2">
-<a name="idm2523"></a><h3>
+<a name="idm2599"></a><h3>
 <a name="boost.scope.exception_checkerconstruct-copy-destruct"></a><code class="computeroutput">exception_checker</code> 
         public
        construct/copy/destruct</h3>
 <div class="orderedlist"><ol class="orderedlist" type="1"><li class="listitem">
-<pre class="literallayout"><a name="idm2263-bb"></a><span class="identifier">exception_checker</span><span class="special">(</span><span class="special">)</span> <span class="keyword">noexcept</span><span class="special">;</span></pre>Constructs the predicate. <p>Upon construction, the predicate saves the current number of uncaught exceptions. This information will be used when calling the predicate to detect if a new exception is being thrown.</p>
+<pre class="literallayout"><a name="idm2325-bb"></a><span class="identifier">exception_checker</span><span class="special">(</span><span class="special">)</span> <span class="keyword">noexcept</span><span class="special">;</span></pre>Constructs the predicate. <p>Upon construction, the predicate saves the current number of uncaught exceptions. This information will be used when calling the predicate to detect if a new exception is being thrown.</p>
 <p><span class="bold"><strong>Throws:</strong></span> Nothing. </p>
 </li></ol></div>
 </div>
 <div class="refsect2">
-<a name="idm2540"></a><h3>
-<a name="idm2251-bb"></a><code class="computeroutput">exception_checker</code> public member functions</h3>
+<a name="idm2616"></a><h3>
+<a name="idm2313-bb"></a><code class="computeroutput">exception_checker</code> public member functions</h3>
 <div class="orderedlist"><ol class="orderedlist" type="1"><li class="listitem">
-<pre class="literallayout"><span class="identifier">result_type</span> <a name="idm2252-bb"></a><span class="keyword">operator</span><span class="special">(</span><span class="special">)</span><span class="special">(</span><span class="special">)</span> <span class="keyword">const</span> <span class="keyword">noexcept</span><span class="special">;</span></pre>Checks if an exception is being thrown. <p><span class="bold"><strong>Throws:</strong></span> Nothing.</p>
+<pre class="literallayout"><span class="identifier">result_type</span> <a name="idm2314-bb"></a><span class="keyword">operator</span><span class="special">(</span><span class="special">)</span><span class="special">(</span><span class="special">)</span> <span class="keyword">const</span> <span class="keyword">noexcept</span><span class="special">;</span></pre>Checks if an exception is being thrown. <p><span class="bold"><strong>Throws:</strong></span> Nothing.</p>
 <p>
 </p>
 <div class="variablelist"><table border="0" class="variablelist compact">
