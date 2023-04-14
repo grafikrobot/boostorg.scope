@@ -545,42 +545,147 @@
         by user on construction. <code class="computeroutput"><a class="link" href="../boost/scope/scope_check.html" title="Class template scope_check">scope_check</a></code>
         will only invoke its action if the condition function returns <code class="computeroutput"><span class="keyword">true</span></code>.
       </p>
-<div class="tip"><table border="0" summary="Tip">
-<tr>
-<td rowspan="2" align="center" valign="top" width="25"><img alt="[Tip]" src="../../../../../doc/src/images/tip.png"></td>
-<th align="left">Tip</th>
-</tr>
-<tr><td align="left" valign="top">
 <p>
-          You may notice that <code class="computeroutput"><a class="link" href="../boost/scope/scope_check.html" title="Class template scope_check">scope_check</a></code>
-          behavior is similar to <code class="computeroutput"><a class="link" href="../boost/scope/scope_fail.html" title="Class template scope_fail">scope_fail</a></code>
-          and opposite to <code class="computeroutput"><a class="link" href="../boost/scope/scope_success.html" title="Class template scope_success">scope_success</a></code>.
-          The main difference is a semantic one: <code class="computeroutput"><a class="link" href="../boost/scope/scope_check.html" title="Class template scope_check">scope_check</a></code>
-          does not have the default condition and doesn't immediately correspond
-          to a success or failure handler. On the other hand, <code class="computeroutput"><a class="link" href="../boost/scope/scope_success.html" title="Class template scope_success">scope_success</a></code>
-          and <code class="computeroutput"><a class="link" href="../boost/scope/scope_fail.html" title="Class template scope_fail">scope_fail</a></code> correspond
-          to their respective intended use cases, and the default condition function
-          makes them equivalent to the scope guards defined in <a href="https://cplusplus.github.io/fundamentals-ts/v3.html#scope.syn" target="_top"><code class="computeroutput"><span class="special">&lt;</span><span class="identifier">experimental</span><span class="special">/</span><span class="identifier">scope</span><span class="special">&gt;</span></code></a>.
-        </p>
+        You may notice that <code class="computeroutput"><a class="link" href="../boost/scope/scope_check.html" title="Class template scope_check">scope_check</a></code>
+        behavior is similar to <code class="computeroutput"><a class="link" href="../boost/scope/scope_fail.html" title="Class template scope_fail">scope_fail</a></code>
+        and opposite to <code class="computeroutput"><a class="link" href="../boost/scope/scope_success.html" title="Class template scope_success">scope_success</a></code>.
+        The main difference is a semantic one: <code class="computeroutput"><a class="link" href="../boost/scope/scope_check.html" title="Class template scope_check">scope_check</a></code>
+        does not have the default condition and doesn't immediately correspond to
+        a success or failure handler. On the other hand, <code class="computeroutput"><a class="link" href="../boost/scope/scope_success.html" title="Class template scope_success">scope_success</a></code>
+        and <code class="computeroutput"><a class="link" href="../boost/scope/scope_fail.html" title="Class template scope_fail">scope_fail</a></code> correspond
+        to their respective intended use cases, and the default condition function
+        makes them equivalent to the scope guards defined in <a href="https://cplusplus.github.io/fundamentals-ts/v3.html#scope.syn" target="_top"><code class="computeroutput"><span class="special">&lt;</span><span class="identifier">experimental</span><span class="special">/</span><span class="identifier">scope</span><span class="special">&gt;</span></code></a>.
+      </p>
 <p>
-          It is also possible to emulate each of the scope guards described in this
-          section by using <code class="computeroutput"><a class="link" href="../boost/scope/scope_exit.html" title="Class template scope_exit">scope_exit</a></code>
-          with the condition function embedded into the action function. The benefit
-          of having separate scope guards instead of using <code class="computeroutput"><a class="link" href="../boost/scope/scope_exit.html" title="Class template scope_exit">scope_exit</a></code>
-          universally is improved code readability. For example, <code class="computeroutput"><a class="link" href="../boost/scope/scope_fail.html" title="Class template scope_fail">scope_fail</a></code>
-          indicates an error handler to the reader, whereas <code class="computeroutput"><a class="link" href="../boost/scope/scope_exit.html" title="Class template scope_exit">scope_exit</a></code>
-          does not have such connotation and would usually contain a general cleanup
-          action. It also allows reducing code duplication, e.g. when the failure
-          condition function is written once and reused in multiple scope guards.
-        </p>
-</td></tr>
+        It is possible to emulate each of the scope guards described in this section
+        by using <code class="computeroutput"><a class="link" href="../boost/scope/scope_exit.html" title="Class template scope_exit">scope_exit</a></code>,
+        either with the condition function embedded into the action function, or
+        by activating or deactivating the scope guard after construction. For example,
+        the following three pieces of code have the same effect:
+      </p>
+<div class="table">
+<a name="scope.scope_guards.condition_functions.comparison_of_scope_fail_and_sco"></a><p class="title"><b>Table 1.3. Comparison of <code class="computeroutput"><span class="identifier">scope_fail</span></code>
+        and <code class="computeroutput"><span class="identifier">scope_exit</span></code></b></p>
+<div class="table-contents"><table class="table" summary="Comparison of scope_fail
+        and scope_exit">
+<colgroup>
+<col>
+<col>
+<col>
+</colgroup>
+<thead><tr>
+<th>
+                <p>
+                  <code class="computeroutput"><span class="identifier">scope_fail</span></code>
+                </p>
+              </th>
+<th>
+                <p>
+                  <code class="computeroutput"><span class="identifier">scope_exit</span></code> with
+                  embedded condition
+                </p>
+              </th>
+<th>
+                <p>
+                  <code class="computeroutput"><span class="identifier">scope_exit</span></code> with
+                  manual deactivation
+                </p>
+              </th>
+</tr></thead>
+<tbody><tr>
+<td>
+<pre class="programlisting"><span class="keyword">void</span> <span class="identifier">push_back</span><span class="special">(</span><span class="keyword">int</span> <span class="identifier">x</span><span class="special">,</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span><span class="keyword">int</span><span class="special">&gt;&amp;</span> <span class="identifier">vec1</span><span class="special">,</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span><span class="keyword">int</span><span class="special">&gt;&amp;</span> <span class="identifier">vec2</span><span class="special">)</span>
+<span class="special">{</span>
+    <span class="identifier">vec1</span><span class="special">.</span><span class="identifier">push_back</span><span class="special">(</span><span class="identifier">x</span><span class="special">);</span>
+
+    <span class="comment">// Revert vec1 modification on failure</span>
+    <span class="identifier">boost</span><span class="special">::</span><span class="identifier">scope</span><span class="special">::</span><span class="identifier">scope_fail</span> <span class="identifier">rollback_guard</span><span class="special">{[&amp;]</span> <span class="special">{</span> <span class="identifier">vec1</span><span class="special">.</span><span class="identifier">pop_back</span><span class="special">();</span> <span class="special">}};</span>
+
+    <span class="identifier">vec2</span><span class="special">.</span><span class="identifier">push_back</span><span class="special">(</span><span class="identifier">x</span><span class="special">);</span>
+<span class="special">}</span>
+</pre>
+              </td>
+<td>
+<pre class="programlisting"><span class="keyword">void</span> <span class="identifier">push_back</span><span class="special">(</span><span class="keyword">int</span> <span class="identifier">x</span><span class="special">,</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span><span class="keyword">int</span><span class="special">&gt;&amp;</span> <span class="identifier">vec1</span><span class="special">,</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span><span class="keyword">int</span><span class="special">&gt;&amp;</span> <span class="identifier">vec2</span><span class="special">)</span>
+<span class="special">{</span>
+    <span class="identifier">vec1</span><span class="special">.</span><span class="identifier">push_back</span><span class="special">(</span><span class="identifier">x</span><span class="special">);</span>
+
+    <span class="comment">// Revert vec1 modification on failure</span>
+    <span class="identifier">boost</span><span class="special">::</span><span class="identifier">scope</span><span class="special">::</span><span class="identifier">scope_exit</span> <span class="identifier">rollback_guard</span>
+    <span class="special">{</span>
+        <span class="special">[&amp;,</span> <span class="identifier">uncaught_count</span> <span class="special">=</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">uncaught_exceptions</span><span class="special">()]</span>
+        <span class="special">{</span>
+            <span class="keyword">if</span> <span class="special">(</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">uncaught_exceptions</span><span class="special">()</span> <span class="special">&gt;</span> <span class="identifier">uncaught_count</span><span class="special">)</span>
+                <span class="identifier">vec1</span><span class="special">.</span><span class="identifier">pop_back</span><span class="special">();</span>
+        <span class="special">}</span>
+    <span class="special">};</span>
+
+    <span class="identifier">vec2</span><span class="special">.</span><span class="identifier">push_back</span><span class="special">(</span><span class="identifier">x</span><span class="special">);</span>
+<span class="special">}</span>
+</pre>
+              </td>
+<td>
+<pre class="programlisting"><span class="keyword">void</span> <span class="identifier">push_back</span><span class="special">(</span><span class="keyword">int</span> <span class="identifier">x</span><span class="special">,</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span><span class="keyword">int</span><span class="special">&gt;&amp;</span> <span class="identifier">vec1</span><span class="special">,</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span><span class="keyword">int</span><span class="special">&gt;&amp;</span> <span class="identifier">vec2</span><span class="special">)</span>
+<span class="special">{</span>
+    <span class="identifier">vec1</span><span class="special">.</span><span class="identifier">push_back</span><span class="special">(</span><span class="identifier">x</span><span class="special">);</span>
+
+    <span class="comment">// Revert vec1 modification on failure</span>
+    <span class="identifier">boost</span><span class="special">::</span><span class="identifier">scope</span><span class="special">::</span><span class="identifier">scope_exit</span> <span class="identifier">rollback_guard</span><span class="special">{[&amp;]</span> <span class="special">{</span> <span class="identifier">vec1</span><span class="special">.</span><span class="identifier">pop_back</span><span class="special">();</span> <span class="special">}};</span>
+
+    <span class="identifier">vec2</span><span class="special">.</span><span class="identifier">push_back</span><span class="special">(</span><span class="identifier">x</span><span class="special">);</span>
+
+    <span class="comment">// Commit vec1 modification</span>
+    <span class="identifier">rollback_guard</span><span class="special">.</span><span class="identifier">set_active</span><span class="special">(</span><span class="keyword">false</span><span class="special">);</span>
+<span class="special">}</span>
+</pre>
+              </td>
+</tr></tbody>
 </table></div>
+</div>
+<br class="table-break"><p>
+        The main benefit of using <code class="computeroutput"><a class="link" href="../boost/scope/scope_fail.html" title="Class template scope_fail">scope_fail</a></code>
+        in this example is reducing code size and complexity. You can see that adding
+        the check for the number of uncaught exceptions to the scope guard action
+        makes it notably more verbose, and if such a check needs to be performed
+        in multiple scope guards, this code would have to be duplicated. Explicitly
+        deactivating the scope guard also has its downsides, as it may be prone to
+        errors if it has to be performed in multiple places of the code (for example,
+        when there are multiple return points, where the transaction needs to be
+        committed). This goes against the intended purpose of the scope guard, as
+        it was supposed to automate the correct execution of its action without the
+        user having to manually ensure this at every possible point of leaving the
+        scope.
+      </p>
 <p>
-        All three scope guards accept the condition function object as the second
-        argument for the constructor or factory function, after the action function
-        object. If the condition function object is default-constructible and the
-        default constructor doesn't throw, the function object may be omitted from
-        the scope guard constructor arguments.
+        Another benefit of <code class="computeroutput"><a class="link" href="../boost/scope/scope_fail.html" title="Class template scope_fail">scope_fail</a></code>
+        is improved code readability. For a reader, <code class="computeroutput"><a class="link" href="../boost/scope/scope_fail.html" title="Class template scope_fail">scope_fail</a></code>
+        immediately indicates an error handler, whereas <code class="computeroutput"><a class="link" href="../boost/scope/scope_exit.html" title="Class template scope_exit">scope_exit</a></code>
+        does not have such connotation and may contain a general cleanup code.
+      </p>
+<p>
+        That being said, there may be reasons to still use one of the techniques
+        demonstrated above instead of <code class="computeroutput"><a class="link" href="../boost/scope/scope_success.html" title="Class template scope_success">scope_success</a></code>/<code class="computeroutput"><a class="link" href="../boost/scope/scope_fail.html" title="Class template scope_fail">scope_fail</a></code>, especially when paired
+        with <code class="computeroutput"><a class="link" href="../boost/scope/exception_checker.html" title="Class exception_checker">exception_checker</a></code>.
+        As noted above, <code class="computeroutput"><a class="link" href="../boost/scope/exception_checker.html" title="Class exception_checker">exception_checker</a></code>
+        is incompatible with coroutines and similar facilities, so using a manually
+        managed <code class="computeroutput"><a class="link" href="../boost/scope/scope_exit.html" title="Class template scope_exit">scope_exit</a></code>
+        can be a solution. Another consideration is performance, specifically in
+        relation with <code class="computeroutput"><a class="link" href="../boost/scope/exception_checker.html" title="Class exception_checker">exception_checker</a></code>.
+        This predicate has to invoke runtime functions to obtain the number of uncaught
+        exceptions, and has to do this twice - on scope guard construction and destruction.
+        Although these functions are usually cheap, these calls are typically not
+        optimized away by the compiler, even if no exception is thrown, and deactivating
+        a scope guard is yet cheaper. So, if a scope guard is used in a tight loop
+        where its performance overhead may be significant, preferring <code class="computeroutput"><a class="link" href="../boost/scope/scope_exit.html" title="Class template scope_exit">scope_exit</a></code> with manual deactivation
+        may be a reasonable choice.
+      </p>
+<p>
+        <code class="computeroutput"><a class="link" href="../boost/scope/scope_success.html" title="Class template scope_success">scope_success</a></code>,
+        <code class="computeroutput"><a class="link" href="../boost/scope/scope_fail.html" title="Class template scope_fail">scope_fail</a></code> and <code class="computeroutput"><a class="link" href="../boost/scope/scope_check.html" title="Class template scope_check">scope_check</a></code> accept the condition
+        function object as the second argument for the constructor or factory function,
+        after the action function object. If the condition function object is default-constructible
+        and the default constructor doesn't throw, the function object may be omitted
+        from the scope guard constructor arguments.
       </p>
 <pre class="programlisting"><span class="comment">// Writes a string to a file using a file descriptor, with file locking.</span>
 <span class="comment">// Reports errors either via an error_code parameter.</span>

@@ -6,7 +6,7 @@
 <meta name="generator" content="DocBook XSL Stylesheets Vsnapshot">
 <link rel="home" href="../../index.html" title="Chapter 1. Boost.Scope">
 <link rel="up" href="../../reference.html#header.boost.scope.scope_final_hpp" title="Header &lt;boost/scope/scope_final.hpp&gt;">
-<link rel="prev" href="make_scope_fail_idm2960.html" title="Function template make_scope_fail">
+<link rel="prev" href="make_scope_fail_idm3176.html" title="Function template make_scope_fail">
 <link rel="next" href="../../BOOST_SCOPE_FINAL.html" title="Macro BOOST_SCOPE_FINAL">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
@@ -14,7 +14,7 @@
 <table cellpadding="2" width="100%"><tr><td valign="top"><img alt="Boost C++ Libraries" width="277" height="86" src="../../../../../../boost.png"></td></tr></table>
 <hr>
 <div class="spirit-nav">
-<a accesskey="p" href="make_scope_fail_idm2960.html"><img src="../../../../../../doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../../reference.html#header.boost.scope.scope_final_hpp"><img src="../../../../../../doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../../../../../doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="../../BOOST_SCOPE_FINAL.html"><img src="../../../../../../doc/src/images/next.png" alt="Next"></a>
+<a accesskey="p" href="make_scope_fail_idm3176.html"><img src="../../../../../../doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../../reference.html#header.boost.scope.scope_final_hpp"><img src="../../../../../../doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../../../../../doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="../../BOOST_SCOPE_FINAL.html"><img src="../../../../../../doc/src/images/next.png" alt="Next"></a>
 </div>
 <div class="refentry">
 <a name="boost.scope.scope_final"></a><div class="titlepage"></div>
@@ -29,13 +29,13 @@
 <span class="keyword">class</span> <a class="link" href="scope_final.html" title="Class template scope_final">scope_final</a> <span class="special">{</span>
 <span class="keyword">public</span><span class="special">:</span>
   <span class="comment">// <a class="link" href="scope_final.html#boost.scope.scope_finalconstruct-copy-destruct">construct/copy/destruct</a></span>
-  <span class="keyword">template</span><span class="special">&lt;</span><span class="keyword">typename</span> F<span class="special">&gt;</span> <a class="link" href="scope_final.html#idm3005-bb"><span class="identifier">scope_final</span></a><span class="special">(</span><span class="identifier">F</span> <span class="special">&amp;&amp;</span><span class="special">)</span> <span class="keyword">noexcept</span><span class="special">(</span><span class="special">...</span><span class="special">)</span><span class="special">;</span>
-  <a class="link" href="scope_final.html#idm3031-bb"><span class="identifier">scope_final</span></a><span class="special">(</span><a class="link" href="scope_final.html" title="Class template scope_final">scope_final</a> <span class="keyword">const</span> <span class="special">&amp;</span><span class="special">)</span> <span class="special">=</span> <span class="keyword">delete</span><span class="special">;</span>
-  <a class="link" href="scope_final.html" title="Class template scope_final">scope_final</a> <span class="special">&amp;</span> <a class="link" href="scope_final.html#idm3035-bb"><span class="keyword">operator</span><span class="special">=</span></a><span class="special">(</span><a class="link" href="scope_final.html" title="Class template scope_final">scope_final</a> <span class="keyword">const</span> <span class="special">&amp;</span><span class="special">)</span> <span class="special">=</span> <span class="keyword">delete</span><span class="special">;</span>
-  <a class="link" href="scope_final.html#idm3041-bb"><span class="special">~</span><span class="identifier">scope_final</span></a><span class="special">(</span><span class="special">)</span><span class="special">;</span>
+  <span class="keyword">template</span><span class="special">&lt;</span><span class="keyword">typename</span> F<span class="special">&gt;</span> <a class="link" href="scope_final.html#idm3221-bb"><span class="identifier">scope_final</span></a><span class="special">(</span><span class="identifier">F</span> <span class="special">&amp;&amp;</span><span class="special">)</span> <span class="keyword">noexcept</span><span class="special">(</span><span class="special">...</span><span class="special">)</span><span class="special">;</span>
+  <a class="link" href="scope_final.html#idm3247-bb"><span class="identifier">scope_final</span></a><span class="special">(</span><a class="link" href="scope_final.html" title="Class template scope_final">scope_final</a> <span class="keyword">const</span> <span class="special">&amp;</span><span class="special">)</span> <span class="special">=</span> <span class="keyword">delete</span><span class="special">;</span>
+  <a class="link" href="scope_final.html" title="Class template scope_final">scope_final</a> <span class="special">&amp;</span> <a class="link" href="scope_final.html#idm3251-bb"><span class="keyword">operator</span><span class="special">=</span></a><span class="special">(</span><a class="link" href="scope_final.html" title="Class template scope_final">scope_final</a> <span class="keyword">const</span> <span class="special">&amp;</span><span class="special">)</span> <span class="special">=</span> <span class="keyword">delete</span><span class="special">;</span>
+  <a class="link" href="scope_final.html#idm3257-bb"><span class="special">~</span><span class="identifier">scope_final</span></a><span class="special">(</span><span class="special">)</span><span class="special">;</span>
 <span class="special">}</span><span class="special">;</span></pre></div>
 <div class="refsect1">
-<a name="idm4777"></a><h2>Description</h2>
+<a name="idm5004"></a><h2>Description</h2>
 <p>A scope exit guard wraps a function object callable with no arguments that can be one of:</p>
 <div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; ">
 <li class="listitem"><p>A user-defined class with a public <code class="computeroutput">operator()</code>. </p></li>
@@ -45,13 +45,13 @@
 <p>
 The scope final guard unconditionally invokes the wrapped function object on destruction. </p>
 <div class="refsect2">
-<a name="idm4789"></a><h3>
+<a name="idm5016"></a><h3>
 <a name="boost.scope.scope_finalconstruct-copy-destruct"></a><code class="computeroutput">scope_final</code> 
         public
        construct/copy/destruct</h3>
 <div class="orderedlist"><ol class="orderedlist" type="1">
 <li class="listitem">
-<pre class="literallayout"><span class="keyword">template</span><span class="special">&lt;</span><span class="keyword">typename</span> F<span class="special">&gt;</span> <a name="idm3005-bb"></a><span class="identifier">scope_final</span><span class="special">(</span><span class="identifier">F</span> <span class="special">&amp;&amp;</span> func<span class="special">)</span> <span class="keyword">noexcept</span><span class="special">(</span><span class="special">...</span><span class="special">)</span><span class="special">;</span></pre>Constructs a scope final guard with a given callable function object. <p><span class="bold"><strong>Requires:</strong></span> <code class="computeroutput">Func</code> is constructible from <span class="emphasis"><em>func</em></span>.</p>
+<pre class="literallayout"><span class="keyword">template</span><span class="special">&lt;</span><span class="keyword">typename</span> F<span class="special">&gt;</span> <a name="idm3221-bb"></a><span class="identifier">scope_final</span><span class="special">(</span><span class="identifier">F</span> <span class="special">&amp;&amp;</span> func<span class="special">)</span> <span class="keyword">noexcept</span><span class="special">(</span><span class="special">...</span><span class="special">)</span><span class="special">;</span></pre>Constructs a scope final guard with a given callable function object. <p><span class="bold"><strong>Requires:</strong></span> <code class="computeroutput">Func</code> is constructible from <span class="emphasis"><em>func</em></span>.</p>
 <p><span class="bold"><strong>Effects:</strong></span> If <code class="computeroutput">Func</code> is nothrow constructible from <code class="computeroutput">F&amp;&amp;</code> then constructs <code class="computeroutput">Func</code> from <code class="computeroutput">std::forward&lt; F &gt;(func)</code>, otherwise constructs from <code class="computeroutput">func</code>.</p>
 <p>If <code class="computeroutput">Func</code> construction throws, invokes <span class="emphasis"><em>func</em></span> before returning with the exception.</p>
 <p><span class="bold"><strong>Throws:</strong></span> Nothing, unless construction of the function object throws.</p>
@@ -77,10 +77,10 @@ The scope final guard unconditionally invokes the wrapped function object on des
 </tr></tbody>
 </table></div>
 </li>
-<li class="listitem"><pre class="literallayout"><a name="idm3031-bb"></a><span class="identifier">scope_final</span><span class="special">(</span><a class="link" href="scope_final.html" title="Class template scope_final">scope_final</a> <span class="keyword">const</span> <span class="special">&amp;</span><span class="special">)</span> <span class="special">=</span> <span class="keyword">delete</span><span class="special">;</span></pre></li>
-<li class="listitem"><pre class="literallayout"><a class="link" href="scope_final.html" title="Class template scope_final">scope_final</a> <span class="special">&amp;</span> <a name="idm3035-bb"></a><span class="keyword">operator</span><span class="special">=</span><span class="special">(</span><a class="link" href="scope_final.html" title="Class template scope_final">scope_final</a> <span class="keyword">const</span> <span class="special">&amp;</span><span class="special">)</span> <span class="special">=</span> <span class="keyword">delete</span><span class="special">;</span></pre></li>
+<li class="listitem"><pre class="literallayout"><a name="idm3247-bb"></a><span class="identifier">scope_final</span><span class="special">(</span><a class="link" href="scope_final.html" title="Class template scope_final">scope_final</a> <span class="keyword">const</span> <span class="special">&amp;</span><span class="special">)</span> <span class="special">=</span> <span class="keyword">delete</span><span class="special">;</span></pre></li>
+<li class="listitem"><pre class="literallayout"><a class="link" href="scope_final.html" title="Class template scope_final">scope_final</a> <span class="special">&amp;</span> <a name="idm3251-bb"></a><span class="keyword">operator</span><span class="special">=</span><span class="special">(</span><a class="link" href="scope_final.html" title="Class template scope_final">scope_final</a> <span class="keyword">const</span> <span class="special">&amp;</span><span class="special">)</span> <span class="special">=</span> <span class="keyword">delete</span><span class="special">;</span></pre></li>
 <li class="listitem">
-<pre class="literallayout"><a name="idm3041-bb"></a><span class="special">~</span><span class="identifier">scope_final</span><span class="special">(</span><span class="special">)</span><span class="special">;</span></pre>Invokes the wrapped callable function object and destroys the callable. <p><span class="bold"><strong>Throws:</strong></span> Nothing, unless invoking the callable throws. </p>
+<pre class="literallayout"><a name="idm3257-bb"></a><span class="special">~</span><span class="identifier">scope_final</span><span class="special">(</span><span class="special">)</span><span class="special">;</span></pre>Invokes the wrapped callable function object and destroys the callable. <p><span class="bold"><strong>Throws:</strong></span> Nothing, unless invoking the callable throws. </p>
 </li>
 </ol></div>
 </div>
@@ -93,7 +93,7 @@ The scope final guard unconditionally invokes the wrapped function object on des
 </div>
 <hr>
 <div class="spirit-nav">
-<a accesskey="p" href="make_scope_fail_idm2960.html"><img src="../../../../../../doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../../reference.html#header.boost.scope.scope_final_hpp"><img src="../../../../../../doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../../../../../doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="../../BOOST_SCOPE_FINAL.html"><img src="../../../../../../doc/src/images/next.png" alt="Next"></a>
+<a accesskey="p" href="make_scope_fail_idm3176.html"><img src="../../../../../../doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../../reference.html#header.boost.scope.scope_final_hpp"><img src="../../../../../../doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../../../../../doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="../../BOOST_SCOPE_FINAL.html"><img src="../../../../../../doc/src/images/next.png" alt="Next"></a>
 </div>
 </body>
 </html>
