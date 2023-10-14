@@ -35,14 +35,16 @@
 <dt><span class="section"><a href="scope/scope_guards.html">Scope guards</a></span></dt>
 <dd><dl>
 <dt><span class="section"><a href="scope/scope_guards.html#scope.scope_guards.conditional">Conditional scope guards:
-      <code class="computeroutput"><span class="identifier">scope_exit</span></code>, <code class="computeroutput"><span class="identifier">scope_success</span></code>,
-      <code class="computeroutput"><span class="identifier">scope_fail</span></code> and <code class="computeroutput"><span class="identifier">scope_check</span></code></a></span></dt>
+      <code class="computeroutput"><span class="identifier">scope_exit</span></code>, <code class="computeroutput"><span class="identifier">scope_success</span></code>
+      and <code class="computeroutput"><span class="identifier">scope_fail</span></code></a></span></dt>
 <dt><span class="section"><a href="scope/scope_guards.html#scope.scope_guards.condition_functions">Scope guard condition
       functions</a></span></dt>
 <dt><span class="section"><a href="scope/scope_guards.html#scope.scope_guards.unconditional">Unconditional scope
       guard: <code class="computeroutput"><span class="identifier">scope_final</span></code></a></span></dt>
 <dt><span class="section"><a href="scope/scope_guards.html#scope.scope_guards.runtime_defined">Setting up scope
       exit actions at run time</a></span></dt>
+<dt><span class="section"><a href="scope/scope_guards.html#scope.scope_guards.comparison_with_boost_scope_exit">Comparison
+      with Boost.ScopeExit library</a></span></dt>
 </dl></dd>
 <dt><span class="section"><a href="scope/unique_resource.html">Unique resource wrapper</a></span></dt>
 <dd><dl><dt><span class="section"><a href="scope/unique_resource.html#scope.unique_resource.resource_traits">Resource traits</a></span></dt></dl></dd>
@@ -50,8 +52,8 @@
 <dd><dl>
 <dt><span class="section"><a href="reference.html#header.boost.scope.error_code_checker_hpp">Header &lt;boost/scope/error_code_checker.hpp&gt;</a></span></dt>
 <dt><span class="section"><a href="reference.html#header.boost.scope.exception_checker_hpp">Header &lt;boost/scope/exception_checker.hpp&gt;</a></span></dt>
-<dt><span class="section"><a href="reference.html#header.boost.scope.fd_resource_hpp">Header &lt;boost/scope/fd_resource.hpp&gt;</a></span></dt>
-<dt><span class="section"><a href="reference.html#header.boost.scope.scope_check_hpp">Header &lt;boost/scope/scope_check.hpp&gt;</a></span></dt>
+<dt><span class="section"><a href="reference.html#header.boost.scope.fd_deleter_hpp">Header &lt;boost/scope/fd_deleter.hpp&gt;</a></span></dt>
+<dt><span class="section"><a href="reference.html#header.boost.scope.fd_resource_traits_hpp">Header &lt;boost/scope/fd_resource_traits.hpp&gt;</a></span></dt>
 <dt><span class="section"><a href="reference.html#header.boost.scope.scope_exit_hpp">Header &lt;boost/scope/scope_exit.hpp&gt;</a></span></dt>
 <dt><span class="section"><a href="reference.html#header.boost.scope.scope_fail_hpp">Header &lt;boost/scope/scope_fail.hpp&gt;</a></span></dt>
 <dt><span class="section"><a href="reference.html#header.boost.scope.scope_final_hpp">Header &lt;boost/scope/scope_final.hpp&gt;</a></span></dt>
@@ -68,7 +70,7 @@
 <a name="scope.intro"></a><a class="link" href="index.html#scope.intro" title="Introduction">Introduction</a>
 </h2></div></div></div>
 <p>
-      The Boost.Scope library is a collection of utilities helping code execution
+      The Boost.Scope library is a collection of utilities helping with code execution
       upon leaving a scope and automatic resource management. The library contains
       components that were defined in the <a href="https://cplusplus.github.io/fundamentals-ts/v3.html" target="_top">C++
       Extensions for Library Fundamentals, Version 3</a> technical specification,
@@ -92,17 +94,16 @@
 <p>
       There is some overlap in terms of functionality with <a href="https://www.boost.org/doc/libs/release/libs/scope_exit/doc/html/index.html" target="_top">Boost.ScopeExit</a>,
       <a href="https://www.boost.org/doc/libs/release/libs/smart_ptr/doc/html/smart_ptr.html" target="_top">Boost.SmartPtr</a>
-      as well as C++ standard library smart-pointers. <a href="https://www.boost.org/doc/libs/release/libs/scope_exit/doc/html/index.html" target="_top">Boost.ScopeExit</a>
-      defines a set of macros for defining code blocks to be executed at scope exit.
-      Scope guards provided by Boost.Scope provide similar functionality, but with
-      simpler syntax and new features. You can see the syntax differences in the
-      table below:
+      as well as C++ standard library smart-pointers. Compared to <a href="https://www.boost.org/doc/libs/release/libs/scope_exit/doc/html/index.html" target="_top">Boost.ScopeExit</a>,
+      scope guards provided by Boost.Scope offer simpler syntax (especially with
+      C++17 capable compilers) and new features for specific use cases. You can see
+      the syntax differences in the table below:
     </p>
 <div class="table">
 <a name="scope.intro.boost_scope_exit_and_boost_scope"></a><p class="title"><b>Table 1.1. <a href="https://www.boost.org/doc/libs/release/libs/scope_exit/doc/html/index.html" target="_top">Boost.ScopeExit</a>
-      and Boost.Scope comparison</b></p>
+      and Boost.Scope syntax overview</b></p>
 <div class="table-contents"><table class="table" summary="Boost.ScopeExit
-      and Boost.Scope comparison">
+      and Boost.Scope syntax overview">
 <colgroup>
 <col>
 <col>
@@ -273,6 +274,11 @@
 </table></div>
 </div>
 <br class="table-break"><p>
+      Detailed comparison between scope guards provided by Boost.Scope and <a href="https://www.boost.org/doc/libs/release/libs/scope_exit/doc/html/index.html" target="_top">Boost.ScopeExit</a>
+      is given in a <a class="link" href="scope/scope_guards.html#scope.scope_guards.comparison_with_boost_scope_exit" title="Comparison with Boost.ScopeExit library">separate
+      section</a>.
+    </p>
+<p>
       Unique resource wrapper provided by Boost.Scope is a generalization of smart
       pointers like <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">unique_ptr</span></code> and <code class="computeroutput"><span class="identifier">boost</span><span class="special">::</span><span class="identifier">scoped_ptr</span></code>
       from <a href="https://www.boost.org/doc/libs/release/libs/smart_ptr/doc/html/smart_ptr.html" target="_top">Boost.SmartPtr</a>.
