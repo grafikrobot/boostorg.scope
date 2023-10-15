@@ -570,19 +570,24 @@
 </tr></thead>
 <tbody><tr>
 <td>
-<pre class="programlisting"><span class="keyword">void</span> <span class="identifier">push_back</span><span class="special">(</span><span class="keyword">int</span> <span class="identifier">x</span><span class="special">,</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span><span class="keyword">int</span><span class="special">&gt;&amp;</span> <span class="identifier">vec1</span><span class="special">,</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span><span class="keyword">int</span><span class="special">&gt;&amp;</span> <span class="identifier">vec2</span><span class="special">)</span>
+<pre class="programlisting"><span class="keyword">void</span> <span class="identifier">push_back</span><span class="special">(</span><span class="keyword">int</span> <span class="identifier">x</span><span class="special">,</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span><span class="keyword">int</span><span class="special">&gt;&amp;</span> <span class="identifier">vec1</span><span class="special">,</span>
+    <span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span><span class="keyword">int</span><span class="special">&gt;&amp;</span> <span class="identifier">vec2</span><span class="special">)</span>
 <span class="special">{</span>
     <span class="identifier">vec1</span><span class="special">.</span><span class="identifier">push_back</span><span class="special">(</span><span class="identifier">x</span><span class="special">);</span>
 
     <span class="comment">// Revert vec1 modification on failure</span>
-    <span class="identifier">boost</span><span class="special">::</span><span class="identifier">scope</span><span class="special">::</span><span class="identifier">scope_fail</span> <span class="identifier">rollback_guard</span><span class="special">{[&amp;]</span> <span class="special">{</span> <span class="identifier">vec1</span><span class="special">.</span><span class="identifier">pop_back</span><span class="special">();</span> <span class="special">}};</span>
+    <span class="identifier">boost</span><span class="special">::</span><span class="identifier">scope</span><span class="special">::</span><span class="identifier">scope_fail</span> <span class="identifier">rollback_guard</span><span class="special">{[&amp;]</span>
+    <span class="special">{</span>
+        <span class="identifier">vec1</span><span class="special">.</span><span class="identifier">pop_back</span><span class="special">();</span>
+    <span class="special">}};</span>
 
     <span class="identifier">vec2</span><span class="special">.</span><span class="identifier">push_back</span><span class="special">(</span><span class="identifier">x</span><span class="special">);</span>
 <span class="special">}</span>
 </pre>
               </td>
 <td>
-<pre class="programlisting"><span class="keyword">void</span> <span class="identifier">push_back</span><span class="special">(</span><span class="keyword">int</span> <span class="identifier">x</span><span class="special">,</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span><span class="keyword">int</span><span class="special">&gt;&amp;</span> <span class="identifier">vec1</span><span class="special">,</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span><span class="keyword">int</span><span class="special">&gt;&amp;</span> <span class="identifier">vec2</span><span class="special">)</span>
+<pre class="programlisting"><span class="keyword">void</span> <span class="identifier">push_back</span><span class="special">(</span><span class="keyword">int</span> <span class="identifier">x</span><span class="special">,</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span><span class="keyword">int</span><span class="special">&gt;&amp;</span> <span class="identifier">vec1</span><span class="special">,</span>
+    <span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span><span class="keyword">int</span><span class="special">&gt;&amp;</span> <span class="identifier">vec2</span><span class="special">)</span>
 <span class="special">{</span>
     <span class="identifier">vec1</span><span class="special">.</span><span class="identifier">push_back</span><span class="special">(</span><span class="identifier">x</span><span class="special">);</span>
 
@@ -598,7 +603,8 @@
 </pre>
               </td>
 <td>
-<pre class="programlisting"><span class="keyword">void</span> <span class="identifier">push_back</span><span class="special">(</span><span class="keyword">int</span> <span class="identifier">x</span><span class="special">,</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span><span class="keyword">int</span><span class="special">&gt;&amp;</span> <span class="identifier">vec1</span><span class="special">,</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span><span class="keyword">int</span><span class="special">&gt;&amp;</span> <span class="identifier">vec2</span><span class="special">)</span>
+<pre class="programlisting"><span class="keyword">void</span> <span class="identifier">push_back</span><span class="special">(</span><span class="keyword">int</span> <span class="identifier">x</span><span class="special">,</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span><span class="keyword">int</span><span class="special">&gt;&amp;</span> <span class="identifier">vec1</span><span class="special">,</span>
+    <span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span><span class="keyword">int</span><span class="special">&gt;&amp;</span> <span class="identifier">vec2</span><span class="special">)</span>
 <span class="special">{</span>
     <span class="identifier">vec1</span><span class="special">.</span><span class="identifier">push_back</span><span class="special">(</span><span class="identifier">x</span><span class="special">);</span>
 
@@ -617,12 +623,16 @@
 </pre>
               </td>
 <td>
-<pre class="programlisting"><span class="keyword">void</span> <span class="identifier">push_back</span><span class="special">(</span><span class="keyword">int</span> <span class="identifier">x</span><span class="special">,</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span><span class="keyword">int</span><span class="special">&gt;&amp;</span> <span class="identifier">vec1</span><span class="special">,</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span><span class="keyword">int</span><span class="special">&gt;&amp;</span> <span class="identifier">vec2</span><span class="special">)</span>
+<pre class="programlisting"><span class="keyword">void</span> <span class="identifier">push_back</span><span class="special">(</span><span class="keyword">int</span> <span class="identifier">x</span><span class="special">,</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span><span class="keyword">int</span><span class="special">&gt;&amp;</span> <span class="identifier">vec1</span><span class="special">,</span>
+    <span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span><span class="keyword">int</span><span class="special">&gt;&amp;</span> <span class="identifier">vec2</span><span class="special">)</span>
 <span class="special">{</span>
     <span class="identifier">vec1</span><span class="special">.</span><span class="identifier">push_back</span><span class="special">(</span><span class="identifier">x</span><span class="special">);</span>
 
     <span class="comment">// Revert vec1 modification on failure</span>
-    <span class="identifier">boost</span><span class="special">::</span><span class="identifier">scope</span><span class="special">::</span><span class="identifier">scope_exit</span> <span class="identifier">rollback_guard</span><span class="special">{[&amp;]</span> <span class="special">{</span> <span class="identifier">vec1</span><span class="special">.</span><span class="identifier">pop_back</span><span class="special">();</span> <span class="special">}};</span>
+    <span class="identifier">boost</span><span class="special">::</span><span class="identifier">scope</span><span class="special">::</span><span class="identifier">scope_exit</span> <span class="identifier">rollback_guard</span><span class="special">{[&amp;]</span>
+    <span class="special">{</span>
+        <span class="identifier">vec1</span><span class="special">.</span><span class="identifier">pop_back</span><span class="special">();</span>
+    <span class="special">}};</span>
 
     <span class="identifier">vec2</span><span class="special">.</span><span class="identifier">push_back</span><span class="special">(</span><span class="identifier">x</span><span class="special">);</span>
 
