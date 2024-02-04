@@ -32,13 +32,13 @@
   <span class="keyword">typedef</span> <span class="keyword">bool</span> <a name="boost.scope.exception_checker.result_type"></a><span class="identifier">result_type</span><span class="special">;</span>  <span class="comment">// Predicate result type. </span>
 
   <span class="comment">// <a class="link" href="exception_checker.html#boost.scope.exception_checkerconstruct-copy-destruct">construct/copy/destruct</a></span>
-  <a class="link" href="exception_checker.html#idm3684-bb"><span class="identifier">exception_checker</span></a><span class="special">(</span><span class="special">)</span> <span class="keyword">noexcept</span><span class="special">;</span>
+  <a class="link" href="exception_checker.html#idm6514-bb"><span class="identifier">exception_checker</span></a><span class="special">(</span><span class="special">)</span> <span class="keyword">noexcept</span><span class="special">;</span>
 
-  <span class="comment">// <a class="link" href="exception_checker.html#idm3672-bb">public member functions</a></span>
-  <span class="identifier">result_type</span> <a class="link" href="exception_checker.html#idm3673-bb"><span class="keyword">operator</span><span class="special">(</span><span class="special">)</span></a><span class="special">(</span><span class="special">)</span> <span class="keyword">const</span> <span class="keyword">noexcept</span><span class="special">;</span>
+  <span class="comment">// <a class="link" href="exception_checker.html#idm6502-bb">public member functions</a></span>
+  <span class="identifier">result_type</span> <a class="link" href="exception_checker.html#idm6503-bb"><span class="keyword">operator</span><span class="special">(</span><span class="special">)</span></a><span class="special">(</span><span class="special">)</span> <span class="keyword">const</span> <span class="keyword">noexcept</span><span class="special">;</span>
 <span class="special">}</span><span class="special">;</span></pre></div>
 <div class="refsect1">
-<a name="idm3965"></a><h2>Description</h2>
+<a name="idm6972"></a><h2>Description</h2>
 <p>On construction, the predicate captures the current number of uncaught exceptions, which it then compares with the number of uncaught exceptions at the point when it is called. If the number increased then a new exception is detected and the predicate returns <code class="computeroutput">true</code>.</p>
 <div class="note"><table border="0" summary="Note">
 <tr>
@@ -50,20 +50,20 @@
 <p>
 </p>
 <div class="refsect2">
-<a name="idm3972"></a><h3>
+<a name="idm6979"></a><h3>
 <a name="boost.scope.exception_checkerconstruct-copy-destruct"></a><code class="computeroutput">exception_checker</code> 
         public
        construct/copy/destruct</h3>
 <div class="orderedlist"><ol class="orderedlist" type="1"><li class="listitem">
-<pre class="literallayout"><a name="idm3684-bb"></a><span class="identifier">exception_checker</span><span class="special">(</span><span class="special">)</span> <span class="keyword">noexcept</span><span class="special">;</span></pre>Constructs the predicate. <p>Upon construction, the predicate saves the current number of uncaught exceptions. This information will be used when calling the predicate to detect if a new exception is being thrown.</p>
+<pre class="literallayout"><a name="idm6514-bb"></a><span class="identifier">exception_checker</span><span class="special">(</span><span class="special">)</span> <span class="keyword">noexcept</span><span class="special">;</span></pre>Constructs the predicate. <p>Upon construction, the predicate saves the current number of uncaught exceptions. This information will be used when calling the predicate to detect if a new exception is being thrown.</p>
 <p><span class="bold"><strong>Throws:</strong></span> Nothing. </p>
 </li></ol></div>
 </div>
 <div class="refsect2">
-<a name="idm3989"></a><h3>
-<a name="idm3672-bb"></a><code class="computeroutput">exception_checker</code> public member functions</h3>
+<a name="idm6996"></a><h3>
+<a name="idm6502-bb"></a><code class="computeroutput">exception_checker</code> public member functions</h3>
 <div class="orderedlist"><ol class="orderedlist" type="1"><li class="listitem">
-<pre class="literallayout"><span class="identifier">result_type</span> <a name="idm3673-bb"></a><span class="keyword">operator</span><span class="special">(</span><span class="special">)</span><span class="special">(</span><span class="special">)</span> <span class="keyword">const</span> <span class="keyword">noexcept</span><span class="special">;</span></pre>Checks if an exception is being thrown. <p><span class="bold"><strong>Throws:</strong></span> Nothing.</p>
+<pre class="literallayout"><span class="identifier">result_type</span> <a name="idm6503-bb"></a><span class="keyword">operator</span><span class="special">(</span><span class="special">)</span><span class="special">(</span><span class="special">)</span> <span class="keyword">const</span> <span class="keyword">noexcept</span><span class="special">;</span></pre>Checks if an exception is being thrown. <p><span class="bold"><strong>Throws:</strong></span> Nothing.</p>
 <p>
 </p>
 <div class="variablelist"><table border="0" class="variablelist compact">
@@ -80,7 +80,7 @@
 </div>
 </div>
 </div>
-<div class="copyright-footer">Copyright © 2022, 2023 Andrey Semashev<p>
+<div class="copyright-footer">Copyright © 2022-2024 Andrey Semashev<p>
         Distributed under the Boost Software License, Version 1.0. (See accompanying
         file LICENSE_1_0.txt or copy at <a href="https://www.boost.org/LICENSE_1_0.txt" target="_top">https://www.boost.org/LICENSE_1_0.txt</a>).
       </p>
