@@ -658,14 +658,17 @@
         its action when the condition returns <code class="computeroutput"><span class="keyword">false</span></code>
         (i.e. when the failure is not detected) and <code class="computeroutput"><a class="link" href="../boost/scope/scope_fail.html" title="Class template scope_fail">scope_fail</a></code>
         - when the condition returns <code class="computeroutput"><span class="keyword">true</span></code>
-        (i.e. when the failure is detected).
+        (i.e. when the failure is detected). In relation to these two scope guard
+        types, the condition function object is sometimes called the failure condition
+        because it indicates whether a failure has happened.
       </p>
 <p>
         You may notice that <code class="computeroutput"><a class="link" href="../boost/scope/scope_exit.html" title="Class template scope_exit">scope_exit</a></code>
         behavior (with a user-specified condition function object) is similar to
         <code class="computeroutput"><a class="link" href="../boost/scope/scope_fail.html" title="Class template scope_fail">scope_fail</a></code> and opposite
-        to <code class="computeroutput"><a class="link" href="../boost/scope/scope_success.html" title="Class template scope_success">scope_success</a></code>.
-        The main difference is a semantic one: <code class="computeroutput"><a class="link" href="../boost/scope/scope_exit.html" title="Class template scope_exit">scope_exit</a></code>
+        to <code class="computeroutput"><a class="link" href="../boost/scope/scope_success.html" title="Class template scope_success">scope_success</a></code>
+        in terms of their usage of condition function objects. The main difference
+        is a semantic one: <code class="computeroutput"><a class="link" href="../boost/scope/scope_exit.html" title="Class template scope_exit">scope_exit</a></code>
         does not have a success/failure connotation and may be used with arbitrary
         condition functions. On the other hand, <code class="computeroutput"><a class="link" href="../boost/scope/scope_success.html" title="Class template scope_success">scope_success</a></code>
         and <code class="computeroutput"><a class="link" href="../boost/scope/scope_fail.html" title="Class template scope_fail">scope_fail</a></code> typically
@@ -2034,7 +2037,7 @@
 <span class="special">{</span>
     <span class="keyword">bool</span> <span class="identifier">pv_inserted</span> <span class="special">=</span> <span class="keyword">false</span><span class="special">;</span>
     <span class="comment">// Initially active scope guard, but blocked by pv_inserted == false</span>
-    <span class="identifier">std</span><span class="special">::</span><span class="identifier">experimental</span><span class="special">::</span><span class="identifier">scope_fail</span> <span class="identifier">pv_rollback</span><span class="special">([</span><span class="identifier">pv</span><span class="special">,</span> <span class="special">&amp;</span><span class="identifier">pv_inserted</span><span class="special">]</span>
+    <span class="identifier">std</span><span class="special">::</span><span class="identifier">experimental</span><span class="special">::</span><span class="identifier">scope_exit</span> <span class="identifier">pv_rollback</span><span class="special">([</span><span class="identifier">pv</span><span class="special">,</span> <span class="special">&amp;</span><span class="identifier">pv_inserted</span><span class="special">]</span>
     <span class="special">{</span>
         <span class="keyword">if</span> <span class="special">(</span><span class="identifier">pv_inserted</span><span class="special">)</span>
             <span class="identifier">pv</span><span class="special">-&gt;</span><span class="identifier">pop_back</span><span class="special">();</span>
@@ -2047,7 +2050,7 @@
 
     <span class="keyword">auto</span> <span class="special">[</span><span class="identifier">it</span><span class="special">,</span> <span class="identifier">inserted</span><span class="special">]</span> <span class="special">=</span> <span class="identifier">set</span><span class="special">.</span><span class="identifier">insert</span><span class="special">(</span><span class="identifier">value</span><span class="special">);</span> <span class="comment">// may throw</span>
     <span class="comment">// Initially active scope guard, which we immediately deactivate if no element was inserted</span>
-    <span class="identifier">std</span><span class="special">::</span><span class="identifier">experimental</span><span class="special">::</span><span class="identifier">scope_fail</span> <span class="identifier">set_rollback</span><span class="special">([&amp;</span><span class="identifier">set</span><span class="special">,</span> <span class="special">&amp;</span><span class="identifier">it</span><span class="special">]</span> <span class="special">{</span> <span class="identifier">set</span><span class="special">.</span><span class="identifier">erase</span><span class="special">(</span><span class="identifier">it</span><span class="special">);</span> <span class="special">});</span>
+    <span class="identifier">std</span><span class="special">::</span><span class="identifier">experimental</span><span class="special">::</span><span class="identifier">scope_exit</span> <span class="identifier">set_rollback</span><span class="special">([&amp;</span><span class="identifier">set</span><span class="special">,</span> <span class="special">&amp;</span><span class="identifier">it</span><span class="special">]</span> <span class="special">{</span> <span class="identifier">set</span><span class="special">.</span><span class="identifier">erase</span><span class="special">(</span><span class="identifier">it</span><span class="special">);</span> <span class="special">});</span>
     <span class="keyword">if</span> <span class="special">(!</span><span class="identifier">inserted</span><span class="special">)</span>
         <span class="identifier">set_rollback</span><span class="special">.</span><span class="identifier">release</span><span class="special">();</span>
 
@@ -2146,7 +2149,8 @@
           or not, the program will terminate either way in this case.
         </p>
 <p>
-          This Boost.Scope feature cannot be emulated with TS scope guards.
+          This Boost.Scope feature cannot be emulated with TS scope guards (other
+          than when the use case fits <code class="computeroutput"><span class="identifier">scope_success</span></code>).
         </p>
 </div>
 </div>
